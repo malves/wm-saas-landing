@@ -1,0 +1,58 @@
+<!-- Header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <div class="text-sm text-muted mb-1">Librairies / Nouvelle</div>
+    <h1 class="text-2xl md:text-3xl font-bold">Créer une librairie</h1>
+  </div>
+</div>
+
+<!-- Flash messages -->
+<%- include('../../partials/flash') %>
+
+<!-- Form -->
+<div class="bg-card rounded-2xl p-6 md:p-8 shadow-sm border border-border">
+  <form method="POST" action="/libraries" class="space-y-6">
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-primary">Nom de la librairie *</label>
+      <input 
+        type="text" 
+        name="name" 
+        value="<%= typeof formData !== 'undefined' ? (formData.name || '') : '' %>"
+        placeholder="Ex: Landing Promo Été 2024" 
+        class="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 text-primary placeholder:text-muted"
+        required
+      >
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-primary">Description</label>
+      <textarea 
+        name="description" 
+        placeholder="Décrivez cette librairie (optionnel)"
+        rows="3"
+        class="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 text-primary placeholder:text-muted resize-none"
+      ><%= typeof formData !== 'undefined' ? (formData.description || '') : '' %></textarea>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <p class="text-blue-900 font-semibold text-sm mb-1">À propos des librairies</p>
+          <p class="text-blue-800 text-sm">Une librairie contient tous les fichiers HTML, CSS, JS et images nécessaires pour vos campagnes. Vous pourrez uploader les fichiers après la création.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 pt-4">
+      <a href="/libraries" class="px-6 py-3 rounded-xl border border-border text-muted hover:text-primary hover:border-primary transition font-semibold">
+        Annuler
+      </a>
+      <button type="submit" class="flex-1 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition">
+        Créer la librairie
+      </button>
+    </div>
+  </form>
+</div>

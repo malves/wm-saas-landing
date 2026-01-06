@@ -1,0 +1,254 @@
+<%
+  const formatNumber = (value) => {
+    const num = Number(value);
+    if (Number.isNaN(num)) return value || 0;
+    return num.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+  
+  const formatDate = (dateString) => {
+    if (!dateString) return '—';
+    return new Date(dateString).toLocaleDateString('fr-FR', { 
+      day: '2-digit', 
+      month: 'long', 
+      year: 'numeric' 
+    });
+  };
+  
+  const getStatusConfig = (status) => {
+    const configs = {
+      paid: { label: 'Payée', class: 'bg-success/10 text-success border-success/20' },
+      pending: { label: 'En cours', class: 'bg-warning/10 text-warning border-warning/20' },
+      overdue: { label: 'En retard', class: 'bg-danger/10 text-danger border-danger/20' },
+      upcoming: { label: 'À venir', class: 'bg-muted/10 text-muted border-muted/20' }
+    };
+    return configs[status] || { label: status, class: 'bg-muted/10 text-muted border-muted/20' };
+  };
+  
+  const statusConfig = getStatusConfig(invoice.status);
+%>
+
+<!-- Header -->
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+  <div>
+    <div class="flex items-center gap-2 text-sm text-muted mb-2">
+      <a href="/billing" class="hover:text-primary">Facturation</a>
+      <span>/</span>
+      <span class="text-primary font-medium"><%= invoice.invoiceNumber %></span>
+    </div>
+    <h1 class="text-3xl md:text-4xl font-bold">Facture <%= invoice.invoiceNumber %></h1>
+    <p class="text-muted text-sm mt-2 max-w-2xl">
+      <%= invoice.description %>
+    </p>
+  </div>
+  <div class="flex flex-wrap items-center gap-3">
+    <a href="/billing/<%= invoice.id %>/download" class="px-4 py-2 rounded-xl border border-border text-primary font-semibold hover:-translate-y-0.5 transition text-sm shadow-sm">
+      Télécharger PDF
+    </a>
+    <% if (invoice.status !== 'paid') { %>
+      <form method="POST" action="/billing/<%= invoice.id %>/mark-as-paid" class="inline">
+        <button type="submit" class="px-4 py-2 rounded-xl bg-success text-white font-semibold hover:bg-success/90 transition text-sm">
+          Marquer comme payée
+        </button>
+      </form>
+    <% } %>
+  </div>
+</div>
+
+<div class="space-y-8">
+  <!-- Invoice Header Card -->
+  <section class="relative rounded-3xl overflow-hidden bg-card text-primary p-8 md:p-12 border border-border">
+    <div class="grid gap-8 lg:grid-cols-[1.6fr,1fr]">
+      <div class="space-y-6">
+        <div class="flex items-center gap-4 text-xs uppercase tracking-[0.4em]">
+          <span class="text-muted">FACTURE</span>
+          <span class="px-3 py-1.5 rounded-full border font-semibold <%= statusConfig.class %>">
+            <%= statusConfig.label %>
+          </span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-semibold"><%= invoice.invoiceNumber %></h2>
+        <p class="text-muted max-w-2xl"><%= invoice.description %></p>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-background border border-border rounded-2xl p-4">
+            <p class="text-xs tracking-[0.3em] text-muted uppercase">Date d'émission</p>
+            <p class="text-xl font-semibold mt-2"><%= formatDate(invoice.createdAt) %></p>
+          </div>
+          <div class="bg-background border border-border rounded-2xl p-4">
+            <p class="text-xs tracking-[0.3em] text-muted uppercase">Date d'échéance</p>
+            <p class="text-xl font-semibold mt-2"><%= formatDate(invoice.dueDate) %></p>
+          </div>
+          <div class="bg-background border border-border rounded-2xl p-4">
+            <p class="text-xs tracking-[0.3em] text-muted uppercase">
+              <% if (invoice.paidAt) { %>
+                Payée le
+              <% } else { %>
+                Statut
+              <% } %>
+            </p>
+            <% if (invoice.paidAt) { %>
+              <p class="text-xl font-semibold text-success mt-2"><%= formatDate(invoice.paidAt) %></p>
+            <% } else { %>
+              <p class="text-xl font-semibold <%= invoice.status === 'overdue' ? 'text-danger' : 'text-warning' %> mt-2">
+                <%= statusConfig.label %>
+              </p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-background text-primary rounded-2xl p-6 space-y-5 border border-border">
+        <div>
+          <h3 class="text-xl font-semibold">Montant total</h3>
+        </div>
+        <div class="space-y-3 text-sm">
+          <div class="flex items-center justify-between py-2">
+            <span class="text-muted">Sous-total HT</span>
+            <span class="font-semibold text-lg whitespace-nowrap"><%= formatNumber(invoice.subtotal) %> €</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-t border-border">
+            <span class="text-muted">TVA (20%)</span>
+            <span class="font-semibold whitespace-nowrap"><%= formatNumber(invoice.tax) %> €</span>
+          </div>
+          <div class="flex items-center justify-between py-3 border-t-2 border-primary">
+            <span class="text-xs uppercase tracking-[0.3em] text-muted">Total TTC</span>
+            <span class="font-bold text-3xl text-primary whitespace-nowrap"><%= formatNumber(invoice.total) %> €</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Invoice Items -->
+  <section class="bg-card border border-border rounded-[32px] p-6 md:p-8 space-y-6">
+    <div>
+      <p class="text-xs uppercase tracking-[0.4em] text-muted">Détails</p>
+      <h3 class="text-2xl font-semibold">Lignes de facturation</h3>
+    </div>
+    
+    <div class="overflow-x-auto rounded-3xl border border-border">
+      <table class="min-w-full text-sm">
+        <thead class="bg-background text-muted uppercase text-xs tracking-[0.35em]">
+          <tr>
+            <th class="px-6 py-4 text-left">Description</th>
+            <th class="px-6 py-4 text-center">Quantité</th>
+            <th class="px-6 py-4 text-right">Prix unitaire</th>
+            <th class="px-6 py-4 text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border">
+          <% invoice.items.forEach(item => { %>
+            <tr>
+              <td class="px-6 py-5">
+                <p class="font-semibold"><%= item.name %></p>
+              </td>
+              <td class="px-6 py-5 text-center text-muted">
+                <%= formatNumber(item.quantity) %>
+              </td>
+              <td class="px-6 py-5 text-right text-muted">
+                <span class="whitespace-nowrap"><%= formatNumber(item.unitPrice) %> €</span>
+              </td>
+              <td class="px-6 py-5 text-right">
+                <p class="font-semibold text-primary whitespace-nowrap"><%= formatNumber(item.total) %> €</p>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+        <tfoot class="bg-background">
+          <tr>
+            <td colspan="3" class="px-6 py-4 text-right text-xs uppercase tracking-[0.3em] text-muted">
+              Sous-total HT
+            </td>
+            <td class="px-6 py-4 text-right">
+              <p class="font-semibold text-lg whitespace-nowrap"><%= formatNumber(invoice.subtotal) %> €</p>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3" class="px-6 py-4 text-right text-xs uppercase tracking-[0.3em] text-muted">
+              TVA (20%)
+            </td>
+            <td class="px-6 py-4 text-right">
+              <p class="font-semibold whitespace-nowrap"><%= formatNumber(invoice.tax) %> €</p>
+            </td>
+          </tr>
+          <tr class="border-t-2 border-primary">
+            <td colspan="3" class="px-6 py-5 text-right text-xs uppercase tracking-[0.3em] text-muted">
+              <span class="text-lg">Total TTC</span>
+            </td>
+            <td class="px-6 py-5 text-right">
+              <p class="font-bold text-2xl text-primary whitespace-nowrap"><%= formatNumber(invoice.total) %> €</p>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+  <!-- Additional Info -->
+  <section class="grid gap-6 lg:grid-cols-2">
+    <div class="bg-card border border-border rounded-[28px] p-6 md:p-8 space-y-4">
+      <p class="text-xs uppercase tracking-[0.4em] text-muted">Informations</p>
+      <div class="space-y-4 text-sm">
+        <div class="border border-border rounded-2xl p-4">
+          <p class="text-xs uppercase tracking-[0.3em] text-muted mb-2">Émise par</p>
+          <p class="font-semibold">Landing Hub SAS</p>
+          <p class="text-muted">40 rue du Colisée</p>
+          <p class="text-muted">75008 Paris, France</p>
+          <p class="text-muted mt-2">SIRET: 123 456 789 00012</p>
+          <p class="text-muted">TVA: FR12 123456789</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-card border border-border rounded-[28px] p-6 md:p-8 space-y-4">
+      <p class="text-xs uppercase tracking-[0.4em] text-muted">Conditions de paiement</p>
+      <ul class="space-y-3 text-sm text-muted">
+        <li class="flex gap-3">
+          <span class="text-primary">—</span>
+          <span>Paiement à réception par carte bancaire ou virement.</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-primary">—</span>
+          <span>Facturation automatique le 1er de chaque mois.</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-primary">—</span>
+          <span>Tout retard de paiement peut entraîner une suspension du service.</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-primary">—</span>
+          <span>TVA applicable selon la législation française (20%).</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Actions -->
+  <section class="bg-card border border-border rounded-[28px] p-6 md:p-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <p class="text-xs uppercase tracking-[0.4em] text-muted">Actions</p>
+        <h3 class="text-xl font-semibold">Que souhaitez-vous faire ?</h3>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <a href="/billing" class="px-4 py-2 rounded-xl border border-border text-muted hover:text-primary transition text-sm font-semibold">
+          Retour à la liste
+        </a>
+        <a href="/billing/<%= invoice.id %>/download" class="px-4 py-2 rounded-xl border border-border text-primary font-semibold hover:-translate-y-0.5 transition text-sm shadow-sm">
+          Télécharger PDF
+        </a>
+        <% if (invoice.status !== 'paid') { %>
+          <form method="POST" action="/billing/<%= invoice.id %>/mark-as-paid" class="inline">
+            <button type="submit" class="px-4 py-2 rounded-xl bg-success text-white font-semibold hover:bg-success/90 transition text-sm">
+              Payer maintenant
+            </button>
+          </form>
+        <% } else { %>
+          <button disabled class="px-4 py-2 rounded-xl bg-success/20 text-success font-semibold text-sm cursor-not-allowed">
+            ✓ Facture payée
+          </button>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</div>
+

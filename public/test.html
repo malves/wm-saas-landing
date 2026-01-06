@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dropdown</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-4">Test Dropdown Newsletter</h1>
+
+        <table class="w-full">
+            <thead>
+                <tr class="border-b">
+                    <th class="text-left py-2">Newsletter</th>
+                    <th class="text-left py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b">
+                    <td class="py-2">20 Minutes</td>
+                    <td class="py-2">
+                        <div class="relative">
+                            <button onclick="toggleDropdown('1')" class="text-gray-600 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M4 10a2 2 0 110-4 2 2 0 010 4zM10 10a2 2 0 110-4 2 2 0 010 4zM16 10a2 2 0 110-4 2 2 0 010 4z"/>
+                                </svg>
+                            </button>
+                            <div id="dropdown-1" class="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 hidden">
+                                <div class="py-1">
+                                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                        </svg>
+                                        View Stats
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="border-b">
+                    <td class="py-2">Le Figaro</td>
+                    <td class="py-2">
+                        <div class="relative">
+                            <button onclick="toggleDropdown('2')" class="text-gray-600 hover:text-blue-600 transition p-2 rounded-lg hover:bg-gray-100">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M4 10a2 2 0 110-4 2 2 0 010 4zM10 10a2 2 0 110-4 2 2 0 010 4zM16 10a2 2 0 110-4 2 2 0 010 4z"/>
+                                </svg>
+                            </button>
+                            <div id="dropdown-2" class="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 hidden">
+                                <div class="py-1">
+                                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                        </svg>
+                                        View Stats
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Bouton de test en bas -->
+        <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+            <h3 class="font-semibold mb-2">Bouton de test :</h3>
+            <button onclick="console.log('Test button clicked'); toggleDropdown('test')" class="bg-blue-500 text-white px-4 py-2 rounded">
+                ⋯ Test Dropdown
+            </button>
+            <div id="dropdown-test" class="absolute mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 hidden">
+                <div class="py-1">
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                        <span>📊</span>
+                        Test Action
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to toggle dropdown menus
+        function toggleDropdown(newsletterId) {
+            console.log('Toggle dropdown called with ID:', newsletterId);
+
+            // Toggle the clicked dropdown
+            const targetDropdown = document.getElementById(`dropdown-${newsletterId}`);
+            console.log('Target dropdown element:', targetDropdown);
+
+            if (targetDropdown) {
+                targetDropdown.classList.toggle('hidden');
+                console.log('Dropdown toggled successfully');
+            } else {
+                console.error('Dropdown element not found for ID:', `dropdown-${newsletterId}`);
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const target = event.target;
+            const isClickOnButton = target.closest('[onclick*="toggleDropdown"]');
+            const isClickOnDropdown = target.closest('[id^="dropdown-"]');
+
+            if (!isClickOnButton && !isClickOnDropdown) {
+                document.querySelectorAll('[id^="dropdown-"]').forEach(dropdown => {
+                    dropdown.classList.add('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

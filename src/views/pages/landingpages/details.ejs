@@ -1,0 +1,676 @@
+<%
+  const statusLabels = {
+    published: 'Publiée',
+    draft: 'Brouillon',
+    paused: 'En pause',
+    archived: 'Archivée'
+  };
+  const statusLabel = statusLabels[landingPage.status] || (landingPage.status || 'Indéterminé');
+  const formatNumber = (value) => {
+    const num = Number(value);
+    if (Number.isNaN(num)) return value || 0;
+    return num.toLocaleString('fr-FR');
+  };
+  // Utiliser les vraies stats de visiteurs si disponibles, sinon fallback sur les anciennes données
+  const visitors = (visitorStats && visitorStats.total) || Number(landingPage.visitors) || 0;
+  const conversionRate = Number(landingPage.conversionRate) || 0;
+  const bounceRate = Number((100 - conversionRate * 3).toFixed(1));
+  // Utiliser les vraies stats de la semaine (depuis dailyStats)
+  const visitorGrowth = (visitorStats && visitorStats.thisWeek) || 0;
+  const healthScore = (conversionRate ? Math.min(10, (conversionRate / 8) + 6.3) : 8.2).toFixed(1);
+  const conversionWidthStyle = `style="width:${Math.min(100, conversionRate * 2)}%;"`;
+  
+  // Données du graphique depuis le controller (vraies données)
+  // chartData7 et chartData15 contiennent : labels, visitors, leads, peakVisitors, peakVisitorsDay, peakLeads, peakLeadsDay, avgLeads
+  
+  const performanceChartData = {
+    period7: {
+      labels: chartData7.labels,
+      bars: chartData7.visitors,      // Barres = visites
+      line: chartData7.leads,          // Ligne = leads
+      peakVolume: chartData7.peakVisitors,
+      peakVolumeDay: chartData7.peakVisitorsDay,
+      bestLine: chartData7.peakLeads,
+      bestLineDay: chartData7.peakLeadsDay,
+      avgLine: chartData7.avgLeads
+    },
+    period15: {
+      labels: chartData15.labels,
+      bars: chartData15.visitors,      // Barres = visites
+      line: chartData15.leads,          // Ligne = leads
+      peakVolume: chartData15.peakVisitors,
+      peakVolumeDay: chartData15.peakVisitorsDay,
+      bestLine: chartData15.peakLeads,
+      bestLineDay: chartData15.peakLeadsDay,
+      avgLine: chartData15.avgLeads
+    }
+  };
+  const createdAt = landingPage.createdAt ? new Date(landingPage.createdAt).toLocaleDateString('fr-FR') : '—';
+  const updatedAt = landingPage.updatedAt ? new Date(landingPage.updatedAt).toLocaleDateString('fr-FR') : '—';
+  const timelineBlocks = [
+    { time: '10h12', title: 'Section Hero + CTA principal', desc: 'Image plein écran, bouton d\'inscription.', completion: '74%' },
+    { time: '10h18', title: 'Bénéfices & features', desc: 'Liste des avantages, icônes illustrées.', completion: '31%' },
+    { time: '10h25', title: 'Témoignages & social proof', desc: 'Avis clients, logos partenaires.', completion: '19%' }
+  ];
+  const audienceSegments = [
+    { label: 'Trafic organique', detail: 'SEO · Recherche Google', share: '42%' },
+    { label: 'Réseaux sociaux', detail: 'Facebook · Instagram · LinkedIn', share: '27%' },
+    { label: 'Publicité payante', detail: 'Google Ads · Meta Ads', share: '19%' },
+    { label: 'Direct & Email', detail: 'Lien direct · Campagnes email', share: '12%' }
+  ];
+  const operations = [
+    { name: 'Promo Été 2024', info: 'A/B test CTA + formulaire', status: 'Stable', action: 'Test variant B (05h10)', owner: 'Louis', cta: 'Ouvrir' },
+    { name: 'Webinar Inscription', info: 'Landing page événement', status: 'À surveiller', action: 'Taux rebond élevé (04h32)', owner: 'Camille', cta: 'Détails' },
+    { name: 'Ebook Download', info: 'Lead magnet premium', status: 'Incident', action: 'Formulaire bloqué (06h42)', owner: 'Julien', cta: "Plan d'action" },
+    { name: 'Contact Premium', info: 'Page de contact B2B', status: 'En prod', action: 'CTA mis à jour (05h55)', owner: 'Anaïs', cta: 'Historique' }
+  ];
+  const team = [
+    { label: 'Équipe', name: 'Camille · Owner', desc: 'Gestion des pages · arbitrage quotidien.' },
+    { label: 'Marketing', name: 'Louis · Growth', desc: 'Optimisation conversion + A/B tests.' },
+    { label: 'Design', name: 'Anaïs · UX/UI', desc: 'Design des pages et composants.' },
+    { label: 'Data', name: 'Julien · Analytics', desc: 'Analyse des performances & insights.' }
+  ];
+%>
+
+<!-- Header -->
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+  <div>
+    <div class="flex items-center gap-2 text-sm text-muted mb-2">
+      <a href="/landingpages" class="hover:text-primary">Campagnes</a>
+      <span>/</span>
+      <span class="text-primary font-medium"><%= landingPage.name %></span>
+    </div>
+    <h1 class="text-3xl md:text-4xl font-bold"><%= landingPage.name %> – Détails</h1>
+    <p class="text-muted text-sm mt-2 max-w-2xl">
+      Vue complète des performances, sources de trafic et conversions de cette landing page.
+    </p>
+  </div>
+  <div class="flex flex-wrap items-center gap-3">
+    <% if (mainHtmlFile && landingPage.slug) { %>
+      <a href="/p/<%= landingPage.slug %>" target="_blank" class="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition text-sm">
+        Voir la page live →
+      </a>
+    <% } else { %>
+      <span class="px-4 py-2 rounded-xl bg-muted/20 text-muted font-semibold text-sm cursor-not-allowed">
+        Voir la page live
+      </span>
+    <% } %>
+    <div class="flex items-center gap-2">
+      <a href="/landingpages/<%= landingPage.id %>/edit" class="px-4 py-2 rounded-xl border border-border text-primary font-semibold hover:-translate-y-0.5 transition text-sm shadow-sm">
+        Modifier
+      </a>
+      <form method="POST" action="/landingpages/<%= landingPage.id %>/delete" onsubmit="return confirm('Voulez-vous vraiment supprimer cette landing page ?')" class="inline">
+        <button type="submit" class="px-4 py-2 rounded-xl border border-danger text-danger hover:bg-danger hover:text-white transition text-sm font-semibold">
+          Supprimer
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="space-y-8">
+  <!-- Hero -->
+  <section class="relative rounded-3xl overflow-hidden bg-card text-primary p-8 md:p-12 border border-border">
+    <div class="grid gap-8 lg:grid-cols-[1.6fr,1fr]">
+      <div class="space-y-6">
+        <div class="flex items-center gap-4 text-xs uppercase tracking-[0.4em]">
+          <span class="text-muted">LANDING PAGE</span>
+          <span class="px-3 py-1 rounded-full border border-border text-primary bg-background"><%= statusLabel %></span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-semibold"><%= landingPage.name %></h2>
+        <p class="text-muted max-w-2xl"><%= landingPage.description %></p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-background border border-border rounded-2xl p-4">
+            <p class="text-xs tracking-[0.3em] text-muted uppercase">Visiteurs</p>
+            <p class="text-3xl font-semibold"><%= formatNumber(visitors) %></p>
+            <p class="text-xs text-success mt-1">+<%= formatNumber(visitorGrowth) %> cette semaine</p>
+          </div>
+          <div class="bg-background border border-border rounded-2xl p-4">
+            <p class="text-xs tracking-[0.3em] text-muted uppercase">Conversion</p>
+            <p class="text-3xl font-semibold"><%= conversionRate %>%</p>
+            <p class="text-xs text-muted mt-1">+2,1 pts</p>
+          </div>
+          <div class="bg-background border border-border rounded-2xl p-4">
+            <p class="text-xs tracking-[0.3em] text-muted uppercase">Leads collectés</p>
+            <p class="text-3xl font-semibold"><%= Math.round(visitors * conversionRate / 100) %></p>
+            <div class="mt-4 h-2 bg-border rounded-full overflow-hidden">
+              <div class="h-full bg-primary rounded-full" <%- conversionWidthStyle %>></div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 pt-4 border-t border-border">
+          <div class="flex items-center gap-2">
+            <p class="text-xs text-muted uppercase tracking-[0.3em]">Dernière mise à jour</p>
+            <p class="text-sm font-semibold"><%= updatedAt %></p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-background text-primary rounded-2xl p-6 border border-border flex flex-col h-full">
+        <div class="mb-4">
+          <h3 class="text-xl font-semibold">Configuration de la page</h3>
+        </div>
+        <div class="flex-1 flex flex-col justify-evenly text-sm">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+                <svg class="w-4 h-4 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+              </div>
+              <div>
+                <p class="font-medium text-success">SSL/HTTPS</p>
+                <p class="text-muted text-xs">Connexion sécurisée</p>
+              </div>
+            </div>
+            <span class="px-2 py-1 rounded-full bg-success/10 text-success text-xs font-semibold">Actif</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+                <svg class="w-4 h-4 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+              </div>
+              <div>
+                <p class="font-medium text-success">SEO Optimisé</p>
+                <p class="text-muted text-xs">Meta tags configurés</p>
+              </div>
+            </div>
+            <span class="px-2 py-1 rounded-full bg-success/10 text-success text-xs font-semibold">Vérifié</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <% const hasTemplateAttached = availableHtmlFiles && availableHtmlFiles.length > 0; %>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full <%= hasTemplateAttached ? 'bg-success/10' : 'bg-danger/10' %> flex items-center justify-center">
+                <svg class="w-4 h-4 <%= hasTemplateAttached ? 'text-success' : 'text-danger' %>" fill="currentColor" viewBox="0 0 20 20">
+                  <% if (hasTemplateAttached) { %>
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  <% } else { %>
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                  <% } %>
+                </svg>
+              </div>
+              <div>
+                <p class="font-medium <%= hasTemplateAttached ? 'text-success' : 'text-danger' %>">Template attaché</p>
+                <p class="text-muted text-xs"><%= hasTemplateAttached ? availableHtmlFiles.length : '0' %> fichier<%= hasTemplateAttached && availableHtmlFiles.length > 1 ? 's' : '' %></p>
+              </div>
+            </div>
+            <span class="px-2 py-1 rounded-full <%= hasTemplateAttached ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger' %> text-xs font-semibold"><%= hasTemplateAttached ? 'Configuré' : 'Aucun' %></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <% 
+              // On ne peut vérifier un formulaire que si des templates sont attachés ET qu'un fichier HTML principal est défini
+              // hasTemplateAttached est déjà déclaré plus haut (ligne 199)
+              let hasForm = false;
+              const hasMainHtmlFile = mainHtmlFile && mainHtmlFile.htmlContent;
+              
+              // On vérifie le formulaire uniquement si un template est attaché ET qu'un fichier principal est défini
+              if (hasTemplateAttached && hasMainHtmlFile) {
+                hasForm = mainHtmlFile.htmlContent.toLowerCase().includes('<form');
+              }
+            %>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full <%= hasForm ? 'bg-success/10' : 'bg-danger/10' %> flex items-center justify-center">
+                <svg class="w-4 h-4 <%= hasForm ? 'text-success' : 'text-danger' %>" fill="currentColor" viewBox="0 0 20 20">
+                  <% if (hasForm) { %>
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  <% } else { %>
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                  <% } %>
+                </svg>
+              </div>
+              <div>
+                <p class="font-medium <%= hasForm ? 'text-success' : 'text-danger' %>">Formulaire de capture</p>
+                <p class="text-muted text-xs">
+                  <% if (!hasTemplateAttached) { %>
+                    Aucun template attaché
+                  <% } else if (!hasMainHtmlFile) { %>
+                    Aucun fichier principal défini
+                  <% } else if (hasForm) { %>
+                    Collecte de leads active
+                  <% } else { %>
+                    Aucun formulaire trouvé
+                  <% } %>
+                </p>
+              </div>
+            </div>
+            <span class="px-2 py-1 rounded-full <%= hasForm ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger' %> text-xs font-semibold">
+              <% if (!hasTemplateAttached || !hasMainHtmlFile) { %>
+                Absent
+              <% } else { %>
+                <%= hasForm ? 'Présent' : 'Absent' %>
+              <% } %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Templates Attachés -->
+  <section class="bg-card border border-border rounded-[32px] p-6 md:p-8 space-y-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <p class="text-xs uppercase tracking-[0.4em] text-muted">Templates</p>
+        <h3 class="text-2xl font-semibold">Templates attachés à cette campagne</h3>
+        <p class="text-muted text-sm mt-1">Gérez les templates HTML de cette campagne depuis vos librairies.</p>
+      </div>
+      <button onclick="toggleAttachModal()" class="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition text-sm">
+        Attacher un template
+      </button>
+    </div>
+
+    <!-- Liste des templates attachés regroupés par librairie -->
+    <% 
+      // Regrouper les fichiers par librairie
+      const librariesWithFiles = {};
+      if (availableHtmlFiles && availableHtmlFiles.length > 0) {
+        availableHtmlFiles.forEach(file => {
+          if (!librariesWithFiles[file.libraryId]) {
+            librariesWithFiles[file.libraryId] = {
+              libraryId: file.libraryId,
+              libraryName: file.libraryName,
+              files: []
+            };
+          }
+          librariesWithFiles[file.libraryId].files.push(file);
+        });
+      }
+      const attachedLibraries = Object.values(librariesWithFiles);
+    %>
+    
+    <% if (attachedLibraries.length > 0) { %>
+      <div class="space-y-4">
+        <% attachedLibraries.forEach(library => { %>
+          <div class="border border-border rounded-2xl p-5 bg-background">
+            <!-- En-tête de la librairie avec bouton détacher -->
+            <div class="flex items-center justify-between mb-4 pb-4 border-b border-border">
+              <a href="/libraries/<%= library.libraryId %>" class="flex items-center gap-3 group hover:opacity-80 transition-opacity cursor-pointer">
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-colors">
+                  <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-semibold text-lg group-hover:text-primary transition-colors"><%= library.libraryName %></p>
+                  <p class="text-xs text-muted"><%= library.files.length %> fichier<%= library.files.length > 1 ? 's' : '' %> HTML</p>
+                </div>
+              </a>
+              <form method="POST" action="/landingpages/<%= landingPage.id %>/detach-library" onsubmit="return confirm('Voulez-vous vraiment détacher cette librairie et tous ses fichiers de la campagne ?')">
+                <input type="hidden" name="libraryId" value="<%= library.libraryId %>">
+                <button type="submit" class="px-4 py-2 rounded-lg border border-danger text-danger hover:bg-danger hover:text-white transition text-sm font-semibold flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                  </svg>
+                  Détacher
+                </button>
+              </form>
+            </div>
+
+            <!-- Liste des fichiers HTML de cette librairie -->
+            <div class="space-y-2">
+              <% library.files.forEach(file => {
+                const isMainFile = mainHtmlFile && 
+                                   mainHtmlFile.libraryId === file.libraryId && 
+                                   mainHtmlFile.fileName === file.fileName;
+              %>
+                <div class="bg-card border <%= isMainFile ? 'border-success' : 'border-border/50' %> rounded-xl p-3">
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                      <div class="w-8 h-8 <%= isMainFile ? 'bg-success/10' : 'bg-orange-50' %> rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 <%= isMainFile ? 'text-success' : 'text-orange-600' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <p class="font-medium text-sm truncate"><%= file.fileName %></p>
+                        <p class="text-xs text-muted"><%= file.size %></p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                      <% if (!isMainFile) { %>
+                        <form method="POST" action="/landingpages/<%= landingPage.id %>/set-main-html">
+                          <input type="hidden" name="libraryId" value="<%= file.libraryId %>">
+                          <input type="hidden" name="fileName" value="<%= file.fileName %>">
+                          <input type="hidden" name="filePath" value="<%= file.filePath %>">
+                          <button type="submit" class="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold hover:bg-primary/90 transition">
+                            Définir comme page principale
+                          </button>
+                        </form>
+                      <% } else { %>
+                        <span class="px-3 py-1.5 bg-success/10 text-success rounded-lg text-xs font-semibold">
+                          ✓ Page principale
+                        </span>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- KPI Strip -->
+  <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <article class="bg-card border border-border rounded-3xl p-6 space-y-3">
+      <p class="text-xs uppercase tracking-[0.3em] text-muted">Visites totales</p>
+      <h3 class="text-3xl font-semibold"><%= formatNumber(visitors) %></h3>
+      <p class="text-xs text-muted">12 dernières heures · +18%</p>
+      <div class="h-1.5 bg-background rounded-full overflow-hidden">
+        <div class="h-full bg-primary" style="width:72%"></div>
+      </div>
+    </article>
+    <article class="bg-card border border-border rounded-3xl p-6 space-y-3">
+      <p class="text-xs uppercase tracking-[0.3em] text-muted">Taux de conversion</p>
+      <h3 class="text-3xl font-semibold"><%= conversionRate %>%</h3>
+      <div class="space-y-3 text-sm">
+        <div>
+          <div class="flex justify-between text-muted text-xs"><span>7 derniers jours</span><span><%= (conversionRate + 1.8).toFixed(1) %>%</span></div>
+          <div class="h-1.5 bg-background rounded-full overflow-hidden mt-1"><div class="h-full bg-success" style="width:85%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-muted text-xs"><span>30 derniers jours</span><span><%= (conversionRate - 0.6).toFixed(1) %>%</span></div>
+          <div class="h-1.5 bg-background rounded-full overflow-hidden mt-1"><div class="h-full bg-primary" style="width:79%"></div></div>
+        </div>
+      </div>
+    </article>
+    <article class="bg-card border border-border rounded-3xl p-6 space-y-3">
+      <p class="text-xs uppercase tracking-[0.3em] text-muted">Taux de rebond</p>
+      <h3 class="text-3xl font-semibold"><%= bounceRate %>%</h3>
+      <div class="space-y-3 text-sm">
+        <div>
+          <div class="flex justify-between text-muted text-xs"><span>7 derniers jours</span><span><%= (bounceRate - 2.5).toFixed(1) %>%</span></div>
+          <div class="h-1.5 bg-background rounded-full overflow-hidden mt-1"><div class="h-full bg-success" style="width:85%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-muted text-xs"><span>30 derniers jours</span><span><%= (bounceRate + 1.2).toFixed(1) %>%</span></div>
+          <div class="h-1.5 bg-background rounded-full overflow-hidden mt-1"><div class="h-full bg-primary" style="width:79%"></div></div>
+        </div>
+      </div>
+    </article>
+    <article class="bg-card border border-border rounded-3xl p-6 flex flex-col text-center min-h-[140px]">
+      <p class="text-xs uppercase tracking-[0.3em] text-muted">Score de la page</p>
+      <div class="flex items-center justify-center space-x-2 flex-1">
+        <h3 class="text-5xl font-semibold text-primary"><%= healthScore %></h3>
+        <p class="text-5xl font-semibold text-primary">/ 10</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- Performance Chart -->
+  <section class="bg-card border border-border rounded-[32px] p-6 md:p-8 space-y-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <p class="text-xs uppercase tracking-[0.4em] text-muted">Performances</p>
+        <h3 class="text-2xl font-semibold">Statistiques récentes</h3>
+        <p class="text-muted text-sm mt-1">Évolution des indicateurs clés · visiteurs et conversions.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.3em]">
+        <button id="btn-7days" class="px-4 py-2 rounded-full border border-border text-muted hover:text-primary transition">7 jours</button>
+        <button id="btn-15days" class="px-4 py-2 rounded-full bg-primary text-white">15 jours</button>
+      </div>
+    </div>
+    <div class="grid gap-6 lg:grid-cols-[4fr,1fr]">
+      <div class="bg-background rounded-[28px] border border-border p-5 relative">
+        <div class="flex items-center justify-between text-xs uppercase tracking-[0.35em] text-muted mb-4">
+          <span>Trafic & Leads</span>
+          <div class="flex items-center gap-2">
+            <span class="flex items-center gap-1" style="color: #334155;"><span class="inline-block w-2 h-2 rounded-full" style="background-color: #334155;"></span>Visiteurs</span>
+            <span class="flex items-center gap-1" style="color: #0f172a;"><span class="inline-block w-2 h-2 rounded-full" style="background-color: #0f172a;"></span>Leads</span>
+          </div>
+        </div>
+        <div style="height: 320px; position: relative;">
+          <canvas
+            id="landingPagePerformanceChart"
+            aria-label="Graphique des performances visiteurs vs leads"
+            role="img"
+            data-chart='<%- JSON.stringify(performanceChartData) %>'
+            class="w-full h-full">
+          </canvas>
+        </div>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+        <article class="bg-background border border-border rounded-3xl p-5 space-y-2">
+          <p class="text-xs uppercase tracking-[0.35em] text-muted">Pic trafic</p>
+          <h4 id="stat-peak-volume" class="text-3xl font-semibold"><%= formatNumber(performanceChartData.period7.peakVolume) %></h4>
+          <p class="text-xs text-muted">Jour : <span id="stat-peak-day" class="text-primary font-semibold uppercase tracking-[0.35em]"><%= performanceChartData.period7.peakVolumeDay %></span></p>
+        </article>
+        <article class="bg-background border border-border rounded-3xl p-5 space-y-2">
+          <p class="text-xs uppercase tracking-[0.35em] text-muted">Leads max</p>
+          <h4 id="stat-best-line" class="text-3xl font-semibold"><%= performanceChartData.period7.bestLine %></h4>
+          <p class="text-xs text-muted">Jour : <span id="stat-best-day" class="text-primary font-semibold uppercase tracking-[0.35em]"><%= performanceChartData.period7.bestLineDay %></span></p>
+        </article>
+        <article class="bg-background border border-border rounded-3xl p-5 space-y-2">
+          <p class="text-xs uppercase tracking-[0.35em] text-muted">Moyenne leads/jour</p>
+          <h4 id="stat-avg-line" class="text-3xl font-semibold"><%= performanceChartData.period7.avgLine %></h4>
+          <p class="text-xs text-muted">Total : <span class="text-success font-semibold"><%= chartData7.totalLeads %> leads</span></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
+</div>
+
+<!-- Modal pour attacher un template -->
+<div id="attachTemplateModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  <div class="bg-card rounded-3xl p-6 md:p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-border">
+    <!-- En-tête avec navigation -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <button id="btnBackToLibraries" onclick="showLibrariesStep()" class="hidden text-muted hover:text-primary transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div>
+          <h3 class="text-2xl font-bold" id="modalTitle">Sélectionner une librairie</h3>
+          <p class="text-muted text-sm mt-1" id="modalSubtitle">Choisissez la librairie contenant vos templates</p>
+        </div>
+      </div>
+      <button onclick="toggleAttachModal()" class="text-muted hover:text-primary transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Étape 1 : Liste des librairies -->
+    <div id="librariesStep">
+      <% if (libraries && libraries.length > 0) { %>
+        <div class="space-y-3">
+          <% libraries.forEach(library => { %>
+            <div class="border border-border rounded-2xl p-5 hover:border-primary/30 transition cursor-pointer" onclick="selectLibrary(<%= library.id %>, '<%= library.name.replace(/'/g, "\\'") %>')">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-lg"><%= library.name %></p>
+                    <p class="text-xs text-muted">
+                      <% 
+                        const htmlFiles = library.files ? library.files.filter(f => f.type === 'html' || f.type === 'htm') : [];
+                      %>
+                      <%= htmlFiles.length %> fichier<%= htmlFiles.length > 1 ? 's' : '' %> HTML
+                    </p>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="text-center py-12">
+          <svg class="w-16 h-16 text-muted mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+          </svg>
+          <p class="text-muted mb-4">Aucune librairie disponible</p>
+          <a href="/libraries/create" class="inline-block px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition">
+            Créer une librairie
+          </a>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Étape 2 : Liste des fichiers HTML de la librairie sélectionnée -->
+    <div id="filesStep" class="hidden">
+      <% if (libraries && libraries.length > 0) { %>
+        <% libraries.forEach(library => { %>
+          <div id="library-files-<%= library.id %>" class="hidden space-y-3">
+            <% 
+              const htmlFiles = library.files ? library.files.filter(f => f.type === 'html' || f.type === 'htm') : [];
+            %>
+            <% if (htmlFiles.length > 0) { %>
+              <% htmlFiles.forEach(file => { %>
+                <form method="POST" action="/landingpages/<%= landingPage.id %>/attach-template" class="border border-border rounded-xl p-4 hover:border-primary/30 transition">
+                  <input type="hidden" name="libraryId" value="<%= library.id %>">
+                  <input type="hidden" name="fileName" value="<%= file.name %>">
+                  <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                      <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold truncate"><%= file.name %></p>
+                        <p class="text-xs text-muted"><%= file.size || 'N/A' %></p>
+                      </div>
+                    </div>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90 transition flex-shrink-0">
+                      Attacher
+                    </button>
+                  </div>
+                </form>
+              <% }) %>
+            <% } else { %>
+              <div class="text-center py-12 bg-background rounded-2xl border border-border">
+                <svg class="w-16 h-16 text-muted mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <p class="text-muted">Aucun fichier HTML dans cette librairie</p>
+              </div>
+            <% } %>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleAttachModal() {
+  const modal = document.getElementById('attachTemplateModal');
+  modal.classList.toggle('hidden');
+  
+  // Réinitialiser à l'étape 1 lors de l'ouverture
+  if (!modal.classList.contains('hidden')) {
+    showLibrariesStep();
+  }
+}
+
+// Navigation entre les étapes
+function showLibrariesStep() {
+  document.getElementById('librariesStep').classList.remove('hidden');
+  document.getElementById('filesStep').classList.add('hidden');
+  document.getElementById('btnBackToLibraries').classList.add('hidden');
+  document.getElementById('modalTitle').textContent = 'Sélectionner une librairie';
+  document.getElementById('modalSubtitle').textContent = 'Choisissez la librairie contenant vos templates';
+  
+  // Cacher tous les containers de fichiers
+  document.querySelectorAll('[id^="library-files-"]').forEach(el => {
+    el.classList.add('hidden');
+  });
+}
+
+function selectLibrary(libraryId, libraryName) {
+  document.getElementById('librariesStep').classList.add('hidden');
+  document.getElementById('filesStep').classList.remove('hidden');
+  document.getElementById('btnBackToLibraries').classList.remove('hidden');
+  document.getElementById('modalTitle').textContent = libraryName;
+  document.getElementById('modalSubtitle').textContent = 'Sélectionnez un fichier HTML à attacher';
+  
+  // Afficher les fichiers de la librairie sélectionnée
+  document.querySelectorAll('[id^="library-files-"]').forEach(el => {
+    el.classList.add('hidden');
+  });
+  document.getElementById('library-files-' + libraryId).classList.remove('hidden');
+}
+
+// Fermer la modal en cliquant à l'extérieur
+document.getElementById('attachTemplateModal')?.addEventListener('click', function(e) {
+  if (e.target === this) {
+    toggleAttachModal();
+  }
+});
+
+// Copier dans le presse-papier
+function copyToClipboard(text) {
+  const fullUrl = window.location.origin + text;
+  navigator.clipboard.writeText(fullUrl).then(() => {
+    // Feedback visuel
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = 'Copié !';
+    btn.classList.add('bg-success/10', 'text-success');
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove('bg-success/10', 'text-success');
+    }, 2000);
+  }).catch(err => {
+    console.error('Erreur lors de la copie:', err);
+  });
+}
+
+// Gérer la définition de la page principale avec rechargement
+document.addEventListener('DOMContentLoaded', function() {
+  const setMainForms = document.querySelectorAll('form[action*="/set-main-html"]');
+  
+  setMainForms.forEach(form => {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const button = this.querySelector('button[type="submit"]');
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Chargement...';
+      
+      try {
+        const formData = new FormData(this);
+        
+        const response = await fetch(this.action, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams(formData)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Recharger la page pour voir les changements
+          window.location.reload();
+        } else {
+          throw new Error(data.error || 'Erreur lors de la définition');
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        button.disabled = false;
+        button.textContent = originalText;
+        alert('Erreur lors de la définition de la page principale');
+      }
+    });
+  });
+});
+</script>

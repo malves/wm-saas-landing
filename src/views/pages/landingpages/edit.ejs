@@ -1,0 +1,113 @@
+<!-- Header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <div class="text-sm text-muted mb-1">Campagnes / Modifier</div>
+    <h1 class="text-2xl md:text-3xl font-bold">Modifier <%= landingPage.name %></h1>
+  </div>
+</div>
+
+<!-- Flash messages -->
+<%- include('../../partials/flash') %>
+
+<!-- Form -->
+<div class="bg-card rounded-2xl p-6 md:p-8 shadow-sm border border-border">
+  <form method="POST" action="/landingpages/<%= landingPage.id %>/edit" class="space-y-6">
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-primary">Nom de la landing page *</label>
+      <input 
+        type="text" 
+        name="name" 
+        value="<%= landingPage.name %>"
+        placeholder="Ex: Promo Été 2024 - Inscriptions" 
+        class="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 text-primary placeholder:text-muted"
+        required
+      >
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-primary">Description *</label>
+      <textarea 
+        name="description" 
+        placeholder="Décrivez votre landing page"
+        rows="3"
+        class="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 text-primary placeholder:text-muted resize-none"
+        required
+      ><%= landingPage.description %></textarea>
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-primary">URL personnalisée</label>
+      <div class="flex items-center gap-2">
+        <span class="text-muted text-sm">votre-domaine.com/</span>
+        <input 
+          type="text" 
+          name="slug" 
+          value="<%= landingPage.slug || '' %>"
+          placeholder="promo-ete-2024" 
+          class="flex-1 bg-background border border-border rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 text-primary placeholder:text-muted"
+        >
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-primary">Statut</label>
+      <select 
+        name="status" 
+        class="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 text-primary"
+      >
+        <option value="draft" <%= landingPage.status === 'draft' ? 'selected' : '' %>>Brouillon</option>
+        <option value="published" <%= landingPage.status === 'published' ? 'selected' : '' %>>Publiée</option>
+        <option value="paused" <%= landingPage.status === 'paused' ? 'selected' : '' %>>En pause</option>
+      </select>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-muted">Nombre de visiteurs</label>
+        <div class="relative">
+          <input 
+            type="number" 
+            value="<%= landingPage.visitors %>"
+            class="w-full bg-gray-100 border border-border rounded-xl px-4 py-3 text-muted cursor-not-allowed"
+            disabled
+            readonly
+          >
+          <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+        </div>
+        <p class="text-xs text-muted">Valeur calculée automatiquement</p>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-muted">Taux de conversion (%)</label>
+        <div class="relative">
+          <input 
+            type="text" 
+            value="<%= landingPage.conversionRate %>%"
+            class="w-full bg-gray-100 border border-border rounded-xl px-4 py-3 text-muted cursor-not-allowed"
+            disabled
+            readonly
+          >
+          <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+        </div>
+        <p class="text-xs text-muted">Valeur calculée automatiquement</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 pt-4">
+      <a href="/landingpages/<%= landingPage.id %>" class="px-6 py-3 rounded-xl border border-border text-muted hover:text-primary hover:border-primary transition font-semibold">
+        Annuler
+      </a>
+      <button type="submit" class="flex-1 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition">
+        Enregistrer les modifications
+      </button>
+    </div>
+  </form>
+</div>

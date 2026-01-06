@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wm-saas-landing
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # Ajoutez vos variables d'environnement ici
+      # - DATABASE_URL=postgresql://user:password@db:5432/landinghub
+      # - SESSION_SECRET=your-secret-key
+      # - SMTP_HOST=your-smtp-host
+      # - SMTP_PORT=587
+      # - SMTP_USER=your-email@domain.com
+      # - SMTP_PASS=your-password
+    volumes:
+      # Monter les uploads et templates pour la persistance
+      - ./public/templates:/app/public/templates
+      - ./uploads:/app/uploads
+      # Monter un fichier .env si vous en avez un
+      - ./.env:/app/.env:ro
+    networks:
+      - landing-network
+    depends_on:
+      # Décommentez si vous avez une base de données
+      # - db
+
+
+  # Décommentez et configurez si vous utilisez PostgreSQL
+  # db:
+  #   image: postgres:15-alpine
+  #   container_name: wm-saas-landing-db
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_DB=landinghub
+  #     - POSTGRES_USER=landinghub_user
+  #     - POSTGRES_PASSWORD=your_secure_password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - landing-network
+  #   ports:
+  #     - "5432:5432"
+
+  # Redis pour les sessions (optionnel)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: wm-saas-landing-redis
+  #   restart: unless-stopped
+  #   networks:
+  #     - landing-network
+
+networks:
+  landing-network:
+    driver: bridge
+
+# volumes:
+#   postgres_data:
+#   redis_data:

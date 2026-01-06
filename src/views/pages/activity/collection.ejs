@@ -1,0 +1,64 @@
+<div class="space-y-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold">Collection</h1>
+      <p class="text-muted text-sm mt-2">Vue d'ensemble de toutes vos campagnes</p>
+    </div>
+      <a href="/landingpages" class="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition">
+        Gérer les campagnes
+      </a>
+  </div>
+
+  <!-- Collections Table -->
+  <div class="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full">
+        <thead>
+          <tr class="text-muted text-sm border-b border-border bg-background/50">
+            <th class="text-left px-6 py-4 font-medium">Landing Page</th>
+            <th class="text-left px-6 py-4 font-medium">Visiteurs</th>
+            <th class="text-left px-6 py-4 font-medium">Conversion</th>
+            <th class="text-left px-6 py-4 font-medium">Leads</th>
+            <th class="text-left px-6 py-4 font-medium">Statut</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border">
+          <% landingPages.forEach(landingPage => { %>
+            <tr class="hover:bg-background/30 transition">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <span class="font-bold text-primary"><%= landingPage.name.substring(0, 2) %></span>
+                  </div>
+                  <div>
+                    <p class="font-semibold"><%= landingPage.name %></p>
+                    <p class="text-muted text-xs"><%= landingPage.description %></p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-primary" viewBox="0 0 12 20" fill="currentColor">
+                    <path d="M6 0L0 10.18L6 13.82L12 10.18L6 0Z"/>
+                  </svg>
+                  <span class="font-medium"><%= landingPage.visitors %></span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span class="<%= landingPage.conversionRate > 5 ? 'text-success' : 'text-muted' %> font-semibold">
+                  <%= landingPage.conversionRate %>%
+                </span>
+              </td>
+              <td class="px-6 py-4 font-medium"><%= Math.round(landingPage.visitors * landingPage.conversionRate / 100) %></td>
+              <td class="px-6 py-4 text-muted">
+                <span class="px-3 py-1 rounded-full border border-border text-xs">
+                  <%= landingPage.status === 'published' ? 'Publiée' : landingPage.status === 'draft' ? 'Brouillon' : landingPage.status %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

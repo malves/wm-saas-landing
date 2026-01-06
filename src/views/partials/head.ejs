@@ -1,0 +1,596 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Landing Hub</title>
+  
+  <!-- Fonctions globales pour les modaux des librairies -->
+  <script>
+  // Variables globales pour la gestion des fichiers
+  window.currentPath = '/';
+  window.selectedFiles = [];
+  window.fileSystem = { '/': { folders: [], files: [] } };
+
+  window.openUploadModal = function() {
+    console.log('Opening upload modal...');
+    var modal = document.getElementById('uploadModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      var dest = document.getElementById('upload-destination');
+      if (dest) dest.textContent = window.currentPath;
+    }
+  };
+  window.closeUploadModal = function() {
+    var modal = document.getElementById('uploadModal');
+    if (modal) modal.classList.add('hidden');
+    window.selectedFiles = [];
+    var fileList = document.getElementById('file-list');
+    if (fileList) fileList.innerHTML = '';
+    var fileInput = document.getElementById('fileInput');
+    if (fileInput) fileInput.value = '';
+    if (typeof window.updateUploadButton === 'function') window.updateUploadButton();
+  };
+  window.openCreateFolderModal = function() {
+    console.log('Opening create folder modal...');
+    var modal = document.getElementById('createFolderModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      var dest = document.getElementById('folder-destination');
+      if (dest) dest.textContent = window.currentPath;
+      var folderName = document.getElementById('folderName');
+      if (folderName) { folderName.value = ''; folderName.focus(); }
+    }
+  };
+  window.closeCreateFolderModal = function() {
+    var modal = document.getElementById('createFolderModal');
+    if (modal) modal.classList.add('hidden');
+  };
+  window.loadLibraryStructure = function(callback) {
+    console.log('📁 Loading library structure...');
+    // Extraire l'ID depuis /libraries/1 ou /libraries/1/images
+    var libraryId = window.libraryId || window.location.pathname.split('/')[2];
+    console.log('Library ID:', libraryId);
+    
+    fetch('/libraries/' + libraryId + '/structure')
+      .then(function(response) { 
+        console.log('Response status:', response.status);
+        return response.json(); 
+      })
+      .then(function(data) {
+        console.log('Data received:', data);
+        if (data.success) {
+          // Mettre à jour window.fileSystem avec la structure réelle
+          window.fileSystem = { '/': data.structure };
+          console.log('✅ Structure loaded:', window.fileSystem);
+          
+          // Appeler le callback si fourni
+          if (typeof callback === 'function') {
+            callback();
+          } else if (typeof window.renderFileBrowser === 'function') {
+            window.renderFileBrowser();
+          } else {
+            console.warn('⚠️ renderFileBrowser not yet available, structure loaded but not displayed');
+          }
+        } else {
+          console.error('API returned success=false:', data);
+        }
+      })
+      .catch(function(error) {
+        console.error('❌ Error loading structure:', error);
+      });
+  };
+  
+  window.deleteFolder = function(folderName, folderPath) {
+    if (!confirm('Voulez-vous vraiment supprimer le dossier "' + folderName + '" et tout son contenu ?')) {
+      return;
+    }
+    
+    var libraryId = window.libraryId || window.location.pathname.split('/')[2];
+    
+    fetch('/libraries/' + libraryId + '/folders/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        folderName: folderName,
+        folderPath: folderPath || '/'
+      })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      if (data.success) {
+        console.log('Folder deleted successfully');
+        // Recharger le dossier actuel
+        if (typeof window.navigateToFolder === 'function') {
+          window.navigateToFolder(window.currentPath, false);
+        }
+        if (typeof window.updateStats === 'function') {
+          window.updateStats();
+        }
+      } else {
+        alert('Erreur: ' + data.message);
+      }
+    })
+    .catch(function(error) {
+      console.error('Error deleting folder:', error);
+      alert('Erreur lors de la suppression du dossier');
+    });
+  };
+  
+  window.deleteFile = function(fileName, filePath) {
+    if (!confirm('Voulez-vous vraiment supprimer le fichier "' + fileName + '" ?')) {
+      return;
+    }
+    
+    var libraryId = window.libraryId || window.location.pathname.split('/')[2];
+    
+    fetch('/libraries/' + libraryId + '/files/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileName: fileName,
+        filePath: filePath || '/'
+      })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      if (data.success) {
+        console.log('File deleted successfully');
+        // Recharger le dossier actuel
+        if (typeof window.navigateToFolder === 'function') {
+          window.navigateToFolder(window.currentPath, false);
+        }
+        if (typeof window.updateStats === 'function') {
+          window.updateStats();
+        }
+      } else {
+        alert('Erreur: ' + data.message);
+      }
+    })
+    .catch(function(error) {
+      console.error('Error deleting file:', error);
+      alert('Erreur lors de la suppression du fichier');
+    });
+  };
+  
+  window.uploadFiles = function(files, folderPath) {
+    if (!files || files.length === 0) {
+      console.log('No files to upload');
+      return;
+    }
+    
+    folderPath = folderPath || '/';
+    console.log('Uploading', files.length, 'file(s) to', folderPath);
+    
+    var libraryId = window.libraryId || window.location.pathname.split('/')[2];
+    var formData = new FormData();
+    
+    for (var i = 0; i < files.length; i++) {
+      formData.append('files', files[i]);
+    }
+    
+    // Passer folderPath en query parameter au lieu du body
+    var url = '/libraries/' + libraryId + '/files?folderPath=' + encodeURIComponent(folderPath);
+    
+    fetch(url, {
+      method: 'POST',
+      body: formData
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      if (data.success) {
+        console.log('Files uploaded successfully:', data.files);
+        // Recharger le dossier actuel
+        if (typeof window.navigateToFolder === 'function') {
+          window.navigateToFolder(window.currentPath, false);
+        }
+        if (typeof window.updateStats === 'function') {
+          window.updateStats();
+        }
+      } else {
+        alert('Erreur: ' + data.message);
+      }
+    })
+    .catch(function(error) {
+      console.error('Error uploading files:', error);
+      alert('Erreur lors de l\'upload des fichiers');
+    });
+  };
+  
+  window.setupFileBrowserDragDrop = function() {
+    var browser = document.getElementById('file-browser');
+    if (!browser) return;
+    
+    browser.addEventListener('dragover', function(e) {
+      // Ne pas ajouter de styles si on déplace un élément interne
+      if (window.draggedItem) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      // Effet discret
+      browser.style.opacity = '0.7';
+    });
+    
+    browser.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.target === browser) {
+        browser.style.opacity = '1';
+      }
+    });
+    
+    browser.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      browser.style.opacity = '1';
+      
+      // Ne gérer que les fichiers externes (pas les déplacements internes)
+      var files = e.dataTransfer.files;
+      if (files.length > 0 && !window.draggedItem) {
+        window.uploadFiles(files, window.currentPath);
+      }
+    });
+    
+    console.log('✅ Drag & drop setup for file browser');
+  };
+  
+  window.createFolder = function() {
+    console.log('Creating folder...');
+    var folderNameInput = document.getElementById('folderName');
+    if (!folderNameInput) { console.error('Folder name input not found!'); return; }
+    var folderName = folderNameInput.value.trim();
+    if (!folderName) { alert('Veuillez entrer un nom de dossier'); return; }
+    
+    // Récupérer l'ID de la librairie depuis l'URL
+    var libraryId = window.libraryId || window.location.pathname.split('/')[2];
+    
+    // Appel API pour créer le dossier
+    fetch('/libraries/' + libraryId + '/folders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        folderName: folderName,
+        currentPath: window.currentPath
+      })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      if (data.success) {
+        console.log('Folder created successfully:', data.folder);
+        // Recharger le dossier actuel
+        if (typeof window.navigateToFolder === 'function') {
+          window.navigateToFolder(window.currentPath, false);
+        }
+        if (typeof window.updateStats === 'function') {
+          window.updateStats();
+        }
+        window.closeCreateFolderModal();
+      } else {
+        alert('Erreur: ' + data.message);
+      }
+    })
+    .catch(function(error) {
+      console.error('Error creating folder:', error);
+      alert('Erreur lors de la création du dossier');
+    });
+  };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#141416',
+            background: '#F9F9F9',
+            card: '#FFFFFF',
+            muted: '#777E90',
+            border: '#E2E2E2',
+            success: '#31CB6A',
+            danger: '#E23333',
+            warning: '#F59E0B',
+          },
+          fontFamily: {
+            sans: ['DM Sans', 'Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+  </style>
+
+  <!-- Script de recherche globale -->
+  <script>
+    (function() {
+      // Fonction de debounce pour limiter les appels API
+      function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+
+      // Fonction pour obtenir les couleurs de statut des campagnes
+      function getStatusBadgeClass(status) {
+        const statusClasses = {
+          'published': 'bg-success/10 text-success',
+          'draft': 'bg-gray-100 text-gray-800',
+          'paused': 'bg-warning/10 text-warning',
+          'archived': 'bg-danger/10 text-danger'
+        };
+        return statusClasses[status] || 'bg-gray-100 text-gray-800';
+      }
+
+      function getStatusLabel(status) {
+        const statusLabels = {
+          'published': 'Publiée',
+          'draft': 'Brouillon',
+          'paused': 'En pause',
+          'archived': 'Archivée'
+        };
+        return statusLabels[status] || status;
+      }
+
+      // Variables globales pour la recherche
+      let currentSearchQuery = '';
+      let currentFilter = 'all';
+
+      // Fonction pour effectuer la recherche
+      function performSearch(query, filterType = 'all') {
+        const popup = document.getElementById('search-results-popup');
+        const searchHeader = document.getElementById('search-header');
+        const searchContent = document.getElementById('search-results-content');
+        
+        currentSearchQuery = query;
+        currentFilter = filterType;
+        
+        if (!query || query.length < 3) {
+          popup.classList.add('hidden');
+          searchHeader.classList.add('hidden');
+          return;
+        }
+
+        // Afficher un loader
+        searchContent.innerHTML = `
+          <div class="p-8 text-center">
+            <svg class="w-8 h-8 mx-auto text-primary animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-sm text-muted mt-2">Recherche en cours...</p>
+          </div>
+        `;
+        popup.classList.remove('hidden');
+
+        // Appel API avec filtre
+        fetch(`/api/search?q=${encodeURIComponent(query)}&type=${filterType}`)
+          .then(response => response.json())
+          .then(data => {
+            if (!data.success) {
+              throw new Error(data.error || 'Erreur de recherche');
+            }
+
+            const results = data.results;
+            const hasResults = (results.leads && results.leads.length > 0) ||
+                              (results.campaigns && results.campaigns.length > 0) ||
+                              (results.templates && results.templates.length > 0) ||
+                              (results.users && results.users.length > 0);
+
+            // Toujours afficher le header avec les filtres quand il y a une recherche valide
+            searchHeader.classList.remove('hidden');
+
+            if (!hasResults) {
+              searchContent.innerHTML = `
+                <div class="p-8 text-center">
+                  <svg class="w-16 h-16 mx-auto text-muted mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                  <p class="text-muted">Aucun résultat trouvé pour "<strong>${query}</strong>"</p>
+                </div>
+              `;
+              return;
+            }
+
+            // Construire le HTML des résultats
+            let html = '<div class="p-4">';
+
+            // Section Leads
+            if (results.leads && results.leads.length > 0) {
+              html += `
+                <div class="mb-6">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">LEADS</span>
+                    <span class="text-xs text-muted">${results.leads.length} résultat${results.leads.length > 1 ? 's' : ''}</span>
+                  </div>
+                  <div class="space-y-2">
+              `;
+              results.leads.forEach(lead => {
+                html += `
+                  <a href="/leads/${lead.id}" class="block p-3 rounded-xl hover:bg-background transition group">
+                    <p class="font-semibold group-hover:text-primary transition">${lead.fullName}</p>
+                    <p class="text-sm text-muted">${lead.email}</p>
+                  </a>
+                `;
+              });
+              html += '</div></div>';
+            }
+
+            // Section Campagnes
+            if (results.campaigns && results.campaigns.length > 0) {
+              html += `
+                <div class="mb-6">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold">CAMPAGNES</span>
+                    <span class="text-xs text-muted">${results.campaigns.length} résultat${results.campaigns.length > 1 ? 's' : ''}</span>
+                  </div>
+                  <div class="space-y-2">
+              `;
+              results.campaigns.forEach(campaign => {
+                html += `
+                  <a href="/landingpages/${campaign.id}" class="block p-3 rounded-xl hover:bg-background transition group">
+                    <div class="flex items-center justify-between">
+                      <p class="font-semibold group-hover:text-primary transition flex-1">${campaign.name}</p>
+                      <span class="text-xs px-2 py-1 rounded-full ml-2 ${getStatusBadgeClass(campaign.status)}">${getStatusLabel(campaign.status)}</span>
+                    </div>
+                  </a>
+                `;
+              });
+              html += '</div></div>';
+            }
+
+            // Section Templates
+            if (results.templates && results.templates.length > 0) {
+              html += `
+                <div class="mb-6">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs font-semibold">TEMPLATES</span>
+                    <span class="text-xs text-muted">${results.templates.length} résultat${results.templates.length > 1 ? 's' : ''}</span>
+                  </div>
+                  <div class="space-y-2">
+              `;
+              results.templates.forEach(template => {
+                html += `
+                  <a href="/libraries/${template.id}" class="block p-3 rounded-xl hover:bg-background transition group">
+                    <p class="font-semibold group-hover:text-primary transition">${template.name}</p>
+                    ${template.description ? `<p class="text-sm text-muted">${template.description}</p>` : ''}
+                  </a>
+                `;
+              });
+              html += '</div></div>';
+            }
+
+            // Section Utilisateurs
+            if (results.users && results.users.length > 0) {
+              html += `
+                <div>
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-semibold">UTILISATEURS</span>
+                    <span class="text-xs text-muted">${results.users.length} résultat${results.users.length > 1 ? 's' : ''}</span>
+                  </div>
+                  <div class="space-y-2">
+              `;
+              results.users.forEach(user => {
+                html += `
+                  <div class="p-3 rounded-xl bg-background/50">
+                    <p class="font-semibold">${user.name}</p>
+                    <p class="text-sm text-muted">${user.email} · ${user.role}</p>
+                  </div>
+                `;
+              });
+              html += '</div></div>';
+            }
+
+            html += '</div>';
+            searchContent.innerHTML = html;
+          })
+          .catch(error => {
+            console.error('Erreur de recherche:', error);
+            searchHeader.classList.add('hidden');
+            searchContent.innerHTML = `
+              <div class="p-8 text-center">
+                <svg class="w-16 h-16 mx-auto text-danger mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-danger">Une erreur est survenue lors de la recherche</p>
+              </div>
+            `;
+          });
+      }
+
+      // Fonction pour exporter en CSV
+      function exportSearchResults() {
+        if (!currentSearchQuery || currentSearchQuery.length < 3) {
+          alert('Veuillez effectuer une recherche avant d\'exporter');
+          return;
+        }
+
+        // Télécharger le CSV
+        window.location.href = `/api/search/export?q=${encodeURIComponent(currentSearchQuery)}&type=${currentFilter}`;
+      }
+
+      // Initialisation au chargement de la page
+      window.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('global-search-input');
+        const popup = document.getElementById('search-results-popup');
+        const exportBtn = document.getElementById('export-csv-btn');
+
+        if (!searchInput || !popup) return;
+
+        // Debounce de 300ms pour la recherche
+        const debouncedSearch = debounce(function(query) {
+          performSearch(query, currentFilter);
+        }, 300);
+
+        // Écouter les saisies dans le champ de recherche
+        searchInput.addEventListener('input', function(e) {
+          debouncedSearch(e.target.value.trim());
+        });
+
+        // Gestion des boutons de filtre
+        document.addEventListener('click', function(e) {
+          if (e.target.classList.contains('search-filter-btn')) {
+            // Retirer la classe active de tous les boutons
+            document.querySelectorAll('.search-filter-btn').forEach(btn => {
+              btn.classList.remove('active', 'bg-primary', 'text-white');
+              if (btn.dataset.filter === 'leads') {
+                btn.classList.add('bg-blue-50', 'text-blue-700');
+              } else if (btn.dataset.filter === 'campaigns') {
+                btn.classList.add('bg-green-50', 'text-green-700');
+              } else if (btn.dataset.filter === 'templates') {
+                btn.classList.add('bg-orange-50', 'text-orange-700');
+              } else if (btn.dataset.filter === 'users') {
+                btn.classList.add('bg-purple-50', 'text-purple-700');
+              }
+            });
+
+            // Activer le bouton cliqué
+            e.target.classList.add('active', 'bg-primary', 'text-white');
+            e.target.classList.remove('bg-blue-50', 'text-blue-700', 'bg-green-50', 'text-green-700', 'bg-orange-50', 'text-orange-700', 'bg-purple-50', 'text-purple-700');
+
+            // Relancer la recherche avec le nouveau filtre
+            const filterType = e.target.dataset.filter;
+            currentFilter = filterType;
+            performSearch(currentSearchQuery, filterType);
+          }
+        });
+
+        // Export CSV
+        if (exportBtn) {
+          exportBtn.addEventListener('click', exportSearchResults);
+        }
+
+        // Fermer la popin si on clique à l'extérieur
+        document.addEventListener('click', function(e) {
+          if (!searchInput.contains(e.target) && !popup.contains(e.target)) {
+            popup.classList.add('hidden');
+          }
+        });
+
+        // Fermer avec la touche Escape
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            popup.classList.add('hidden');
+            searchInput.blur();
+          }
+        });
+
+        // Rouvrir la popin si on clique sur l'input et qu'il y a déjà du contenu
+        searchInput.addEventListener('focus', function(e) {
+          if (e.target.value.trim().length >= 3) {
+            performSearch(e.target.value.trim(), currentFilter);
+          }
+        });
+      });
+    })();
+  </script>
+</head>
+

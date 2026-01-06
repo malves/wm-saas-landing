@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voiture Électrique Premium | Plus accessible que vous ne le pensez</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #171a20;
+            --primary-light: #393c41;
+            --accent: #3e6ae1;
+            --accent-light: #5c7cfa;
+            --success: #12b886;
+            --white: #ffffff;
+            --gray-50: #f8f9fa;
+            --gray-100: #f1f3f5;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-500: #868e96;
+            --gray-700: #495057;
+            --gray-900: #212529;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--white);
+            color: var(--gray-900);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--primary);
+            color: var(--white);
+            padding: 0.75rem 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .top-bar strong {
+            color: var(--accent-light);
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .header-btn {
+            background: var(--primary);
+            color: var(--white);
+            padding: 0.85rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .header-btn:hover {
+            background: var(--primary-light);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            padding: 60px 2rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: url('images/ModelYStandard_72.jpg') center/cover no-repeat;
+            opacity: 0.12;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 4rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--accent);
+            color: var(--white);
+            padding: 0.5rem 1.25rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(2.8rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-text h1 .highlight {
+            color: var(--accent);
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            color: var(--gray-700);
+            margin-bottom: 2.5rem;
+            max-width: 520px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            padding: 2rem 0;
+            border-top: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .stat {
+            text-align: left;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value span {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        /* Hero Form */
+        .hero-form {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            color: var(--gray-900);
+            transition: all 0.3s ease;
+            outline: none;
+            background: var(--white);
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(62, 106, 225, 0.1);
+        }
+
+        .form-submit {
+            width: 100%;
+            background: var(--accent);
+            color: var(--white);
+            border: none;
+            padding: 1.1rem;
+            border-radius: 4px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .form-submit:hover {
+            background: var(--accent-light);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        /* Value Props Section */
+        .value-section {
+            padding: 100px 2rem;
+            background: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 3.5vw, 2.8rem);
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--gray-500);
+            line-height: 1.7;
+        }
+
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .value-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .value-image {
+            height: 280px;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .value-image-cost {
+            background: url('images/imgi_519_Roadster_01.jpeg') center/cover no-repeat;
+        }
+
+        .value-image-range {
+            background: url('images/imgi_1321_V4Supercharger_80.jpeg') center/cover no-repeat;
+        }
+
+        .value-block h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .value-block p {
+            font-size: 1rem;
+            color: var(--gray-700);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .value-list {
+            list-style: none;
+        }
+
+        .value-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--gray-700);
+        }
+
+        .value-list li::before {
+            content: '✓';
+            width: 22px;
+            height: 22px;
+            background: var(--success);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 100px 2rem;
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Duo Section */
+        .duo-section {
+            padding: 100px 2rem;
+            background: var(--gray-50);
+        }
+
+        .duo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .duo-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .duo-image {
+            height: 280px;
+            position: relative;
+        }
+
+        .duo-image-charging {
+            background: url('images/imgi_1383_Supercharger_98.jpeg') center/cover no-repeat;
+        }
+
+        .duo-image-interior {
+            background: url('images/imgi_1433_DestinationCharging_93.jpeg') center/cover no-repeat;
+        }
+
+        .duo-image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.25rem;
+            background: linear-gradient(to top, rgba(23, 26, 32, 0.9), transparent);
+        }
+
+        .duo-tag {
+            background: var(--accent);
+            color: var(--white);
+            padding: 0.4rem 0.9rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .duo-text {
+            padding: 2rem;
+        }
+
+        .duo-text h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .duo-text p {
+            font-size: 0.95rem;
+            color: var(--gray-500);
+            line-height: 1.7;
+        }
+
+        /* Showroom Section */
+        .showroom-section {
+            padding: 100px 2rem;
+            background: var(--white);
+        }
+
+        .showroom-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .showroom-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16/10;
+        }
+
+        .showroom-item.showroom-large {
+            grid-row: span 2;
+            aspect-ratio: auto;
+        }
+
+        .showroom-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .showroom-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .showroom-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: linear-gradient(to top, rgba(23, 26, 32, 0.85), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .showroom-item:hover .showroom-overlay {
+            opacity: 1;
+        }
+
+        .showroom-label {
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 2rem;
+            background: var(--white);
+        }
+
+        .cta-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent);
+        }
+
+        .cta-container h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .cta-container p {
+            font-size: 1.1rem;
+            color: var(--gray-500);
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-form .full {
+            grid-column: span 2;
+        }
+
+        .cta-submit {
+            grid-column: span 2;
+            background: var(--accent);
+            color: var(--white);
+            border: none;
+            padding: 1.1rem;
+            border-radius: 4px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .cta-submit:hover {
+            background: var(--accent-light);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 80px 2rem;
+            background: var(--gray-50);
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .faq-item h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .faq-item p {
+            font-size: 0.95rem;
+            color: var(--gray-500);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            background: var(--primary);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        footer p {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+                text-align: center;
+            }
+
+            .hero::before {
+                width: 100%;
+                opacity: 0.08;
+            }
+
+            .hero-form {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .value-grid {
+                grid-template-columns: 1fr;
+                max-width: 550px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .duo-grid {
+                grid-template-columns: 1fr;
+                max-width: 550px;
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+                max-width: 550px;
+            }
+
+            .showroom-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .showroom-item.showroom-large {
+                grid-row: span 1;
+                aspect-ratio: 16/10;
+            }
+
+            .cta-form {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-form .full,
+            .cta-submit {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 40px 2rem;
+                min-height: auto;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                max-width: 300px;
+            }
+
+            .cta-container {
+                padding: 2.5rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        ⚡ <strong>Offre limitée</strong> — Découvrez nos solutions de financement et repartez au volant dès aujourd'hui
+    </div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">Mobilité Électrique</div>
+            <button class="header-btn" onclick="document.getElementById('heroForm').scrollIntoView({behavior: 'smooth'})">Être recontacté</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge">Véhicule 100% électrique</div>
+                <h1>Plus <span class="highlight">accessible</span> que vous ne le pensez</h1>
+                <p class="hero-subtitle">Découvrez comment rouler en électrique premium peut être plus économique qu'un véhicule thermique. Autonomie, recharge, coût total : on vous explique tout.</p>
+
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-value">>500<span>km</span></span>
+                        <span class="stat-label">d'autonomie réelle</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">15<span>min</span></span>
+                        <span class="stat-label">pour 275km de charge</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">-50<span>%</span></span>
+                        <span class="stat-label">coût au km vs thermique</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-form">
+                <div class="form-header">
+                    <h3>Demandez à être recontacté</h3>
+                    <p>Un conseiller vous rappelle sous 24h</p>
+                </div>
+                <form id="heroForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" class="form-input" name="prenom" placeholder="Prénom" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-input" name="nom" placeholder="Nom" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-input" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" class="form-input" name="telephone" placeholder="Téléphone" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" class="form-input" name="codepostal" placeholder="Code postal" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-input" name="ville" placeholder="Ville">
+                        </div>
+                    </div>
+                    <button type="submit" class="form-submit">Demander un rappel →</button>
+                </form>
+                <p class="form-footer">🔒 Vos données restent confidentielles</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="value-section">
+        <div class="section-header">
+            <h2>Deux bonnes raisons de passer à l'électrique</h2>
+            <p>Au-delà de l'écologie, rouler électrique est un choix économique et pratique au quotidien</p>
+        </div>
+        <div class="value-grid">
+            <div class="value-block">
+                <div class="value-image value-image-cost"></div>
+                <h3>Un coût total maîtrisé</h3>
+                <p>Contrairement aux idées reçues, posséder un véhicule électrique premium revient souvent moins cher qu'un véhicule thermique équivalent sur la durée.</p>
+                <ul class="value-list">
+                    <li>Bonus écologique et aides régionales cumulables</li>
+                    <li>Coût de recharge ~3x moins cher que l'essence</li>
+                    <li>Entretien réduit : pas de vidange, moins de pièces d'usure</li>
+                    <li>Solutions de financement adaptées à votre budget</li>
+                </ul>
+            </div>
+            <div class="value-block">
+                <div class="value-image value-image-range"></div>
+                <h3>Autonomie & recharge simplifiées</h3>
+                <p>Fini l'angoisse de la panne. Avec plus de 500km d'autonomie et un réseau de recharge rapide, voyager n'a jamais été aussi serein.</p>
+                <ul class="value-list">
+                    <li>Plus de 500km d'autonomie sur une charge</li>
+                    <li>Réseau de Superchargeurs accessible partout</li>
+                    <li>275km récupérés en seulement 15 minutes</li>
+                    <li>Recharge à domicile pendant la nuit</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>>500km</h3>
+                <p>Autonomie réelle</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔌</div>
+                <h3>15 min</h3>
+                <p>Pour 275km de charge</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>2€</h3>
+                <p>Aux 100km en moyenne</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>5★</h3>
+                <p>Sécurité Euro NCAP</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="duo-section">
+        <div class="duo-grid">
+            <div class="duo-card">
+                <div class="duo-image duo-image-charging">
+                    <div class="duo-image-overlay">
+                        <span class="duo-tag">Réseau de recharge</span>
+                    </div>
+                </div>
+                <div class="duo-text">
+                    <h3>Rechargez en toute simplicité</h3>
+                    <p>Accédez à des milliers de points de charge rapide en France et en Europe. Planification automatique des arrêts, paiement intégré : tout est pensé pour simplifier vos trajets.</p>
+                </div>
+            </div>
+            <div class="duo-card">
+                <div class="duo-image duo-image-interior">
+                    <div class="duo-image-overlay">
+                        <span class="duo-tag">Expérience premium</span>
+                    </div>
+                </div>
+                <div class="duo-text">
+                    <h3>Le luxe accessible</h3>
+                    <p>Intérieur minimaliste, technologie de pointe, mises à jour à distance. Découvrez une nouvelle façon de conduire, plus connectée, plus sereine, plus agréable.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Showroom Section -->
+    <section class="showroom-section">
+        <div class="section-header">
+            <h2>L'excellence électrique en images</h2>
+            <p>Design épuré, technologie de pointe, recharge ultra-rapide</p>
+        </div>
+        <div class="showroom-grid">
+            <div class="showroom-item showroom-large">
+                <img src="images/Group_49.jpg" alt="Véhicule électrique premium" loading="lazy">
+                <div class="showroom-overlay">
+                    <span class="showroom-label">Performance & Élégance</span>
+                </div>
+            </div>
+            <div class="showroom-item">
+                <img src="images/imgi_1435_DestinationCharging_95.jpeg" alt="Recharge destination" loading="lazy">
+                <div class="showroom-overlay">
+                    <span class="showroom-label">Recharge partout</span>
+                </div>
+            </div>
+            <div class="showroom-item">
+                <img src="images/ModelYStandard_72.jpg" alt="Model Y" loading="lazy">
+                <div class="showroom-overlay">
+                    <span class="showroom-label">SUV Électrique</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq-section">
+        <div class="section-header">
+            <h2>Questions fréquentes</h2>
+            <p>Tout ce que vous devez savoir avant de passer à l'électrique</p>
+        </div>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h4>Est-ce vraiment plus économique ?</h4>
+                <p>Oui. Entre le coût de l'énergie (~2€/100km vs 12€ en essence), l'entretien réduit et les aides à l'achat, le coût total de possession est souvent inférieur à un véhicule thermique.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Et si je fais de longs trajets ?</h4>
+                <p>Avec plus de 500km d'autonomie et un réseau de recharge rapide, vous pouvez traverser la France avec seulement 2 arrêts de 15-20 minutes. Le temps d'un café.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Comment recharger à la maison ?</h4>
+                <p>Une simple prise suffit pour commencer. Pour plus de confort, une borne murale permet une recharge complète pendant la nuit. Installation possible avec aides de l'État.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Quelles sont les aides disponibles ?</h4>
+                <p>Bonus écologique jusqu'à 7 000€, prime à la conversion, aides régionales... Cumulées, ces aides peuvent représenter plus de 10 000€ d'économies.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section" id="cta">
+        <div class="cta-container">
+            <h2>Prêt à découvrir l'électrique ?</h2>
+            <p>Laissez vos coordonnées, un conseiller vous recontacte pour répondre à toutes vos questions</p>
+            <form class="cta-form" id="ctaForm">
+                <input type="text" class="form-input" name="prenom" placeholder="Prénom" required>
+                <input type="text" class="form-input" name="nom" placeholder="Nom" required>
+                <input type="tel" class="form-input" name="telephone" placeholder="Téléphone" required>
+                <input type="email" class="form-input" name="email" placeholder="Email" required>
+                <input type="text" class="form-input" name="codepostal" placeholder="Code postal" required>
+                <input type="text" class="form-input" name="ville" placeholder="Ville">
+                <button type="submit" class="cta-submit">Être recontacté →</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p class="footer-text">L'électrique, c'est maintenant.</p>
+        <p>© 2025 — Mobilité Électrique Premium</p>
+    </footer>
+
+    <script>
+        const WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/25139951/ufknvhd/';
+
+        async function sendToZapier(data, source) {
+            try {
+                const payload = { ...data, source, page: 'tesla-lead.html', campaign: 'tesla_q1_2026', timestamp: new Date().toISOString() };
+                await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                console.log('Lead captured:', payload);
+                return true;
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
+        }
+
+        function handleForm(formId, source) {
+            document.getElementById(formId).addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const data = Object.fromEntries(new FormData(this).entries());
+                const btn = this.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = 'Envoi en cours...';
+                btn.disabled = true;
+                await sendToZapier(data, source);
+                btn.innerHTML = '✓ Demande envoyée !';
+                btn.style.background = '#12b886';
+                setTimeout(() => { this.reset(); btn.innerHTML = originalText; btn.style.background = ''; btn.disabled = false; }, 3000);
+            });
+        }
+
+        handleForm('heroForm', 'hero_form');
+        handleForm('ctaForm', 'cta_form');
+
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
+
+

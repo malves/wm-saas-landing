@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+vendor/
+packages/
+
+# Build / dist
+dist/
+build/
+out/
+coverage/
+.tmp/
+.cache/
+
+# Mobile / Expo / Android / iOS
+.expo/
+.expo-shared/
+android/
+ios/
+*.keystore
+
+# .NET
+bin/
+obj/
+
+# Python
+__pycache__/
+.venv/
+venv/
+
+# Logs
+*.log
+logs/
+
+# Environment & secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+secrets/
+vault/
+
+# Databases & local data
+*.db
+*.sqlite
+*.sqlite3
+data/
+storage/
+
+# IDE / OS noise
+.vscode/
+.idea/
+.cursor/
+.DS_Store
+Thumbs.db
+
+# Generated files
+*.min.js
+*.map
+*.generated.*
+*.snap
+
+# Large assets
+assets/videos/
+assets/audio/
+*.mp4
+*.mov
+*.zip
+*.tar
+*.gz
+

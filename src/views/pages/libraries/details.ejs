@@ -1,0 +1,777 @@
+<style>
+/* Drag & Drop styles */
+.drag-over {
+  opacity: 0.8;
+}
+
+[draggable="true"] {
+  cursor: move;
+}
+
+[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.folder-item {
+  transition: opacity 0.2s ease;
+}
+
+.file-item {
+  transition: opacity 0.2s ease;
+}
+
+.breadcrumb-item {
+  transition: all 0.2s ease;
+}
+</style>
+
+<!-- Header -->
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+  <div>
+    <div class="flex items-center gap-2 text-sm text-muted mb-2">
+      <a href="/libraries" class="hover:text-primary">Librairies</a>
+      <span>/</span>
+      <span class="text-primary font-medium"><%= library.name %></span>
+    </div>
+    <h1 class="text-3xl md:text-4xl font-bold"><%= library.name %></h1>
+    <p class="text-muted text-sm mt-2 max-w-2xl">
+      <%= library.description || 'Aucune description' %>
+    </p>
+  </div>
+  <div class="flex flex-wrap items-center gap-3">
+    <form method="POST" action="/libraries/<%= library.id %>/delete" onsubmit="return confirm('Voulez-vous vraiment supprimer cette librairie ?')" class="inline">
+      <button type="submit" class="px-4 py-2 rounded-xl border border-danger text-danger hover:bg-danger hover:text-white transition text-sm font-semibold">
+        Supprimer
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="space-y-8">
+  <!-- Stats Section -->
+  <section class="grid gap-4 md:grid-cols-4">
+    <div class="bg-card border border-border rounded-2xl p-6">
+      <p class="text-xs uppercase tracking-widest text-muted mb-2">Total fichiers</p>
+      <p class="text-3xl font-bold" id="total-files">0</p>
+    </div>
+    <div class="bg-card border border-border rounded-2xl p-6">
+      <p class="text-xs uppercase tracking-widest text-muted mb-2">HTML</p>
+      <p class="text-3xl font-bold text-blue-600" id="html-count">0</p>
+    </div>
+    <div class="bg-card border border-border rounded-2xl p-6">
+      <p class="text-xs uppercase tracking-widest text-muted mb-2">CSS/JS</p>
+      <p class="text-3xl font-bold text-purple-600" id="cssjs-count">0</p>
+    </div>
+    <div class="bg-card border border-border rounded-2xl p-6">
+      <p class="text-xs uppercase tracking-widest text-muted mb-2">Images</p>
+      <p class="text-3xl font-bold text-green-600" id="img-count">0</p>
+    </div>
+  </section>
+
+  <!-- File Browser -->
+  <section class="bg-card border border-border rounded-2xl p-6 md:p-8">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-2xl font-semibold">Explorateur de fichiers</h2>
+        <p class="text-muted text-sm">Organisez vos fichiers par dossiers</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="downloadAll()" class="px-4 py-2 rounded-xl border border-border text-muted font-semibold hover:bg-background transition text-sm">
+          Tout télécharger
+        </button>
+        <button type="button" onclick="openCreateFolderModal()" class="px-4 py-2 rounded-xl border border-border text-primary font-semibold hover:bg-background transition text-sm">
+          Nouveau dossier
+        </button>
+        <button type="button" onclick="openUploadModal()" class="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition text-sm">
+          Ajouter des fichiers
+        </button>
+      </div>
+    </div>
+
+    <!-- Breadcrumb Navigation -->
+    <div class="mb-4 flex items-center gap-2 text-sm">
+      <button onclick="navigateToFolder('/')" 
+              class="breadcrumb-item text-primary hover:underline font-semibold px-2 py-1 rounded transition"
+              data-path="/"
+              ondragover="handleBreadcrumbDragOver(event)"
+              ondrop="handleBreadcrumbDrop(event)"
+              ondragleave="handleBreadcrumbDragLeave(event)">
+        Racine
+      </button>
+      <span id="breadcrumb-path" class="text-muted"></span>
+    </div>
+
+    <!-- Files & Folders Container -->
+    <div id="file-browser" class="min-h-[300px]">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </section>
+</div>
+
+<!-- Modal Upload -->
+<div id="uploadModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  <div class="bg-card rounded-3xl p-6 md:p-8 max-w-2xl w-full border border-border">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h3 class="text-2xl font-bold">Uploader des fichiers</h3>
+        <p class="text-muted text-sm mt-1">Glissez-déposez vos fichiers ou cliquez pour sélectionner</p>
+      </div>
+      <button id="btnCloseUpload" class="text-muted hover:text-primary transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Destination Folder -->
+    <div class="mb-4 p-3 bg-background rounded-xl border border-border">
+      <p class="text-sm text-muted">Destination: <span id="upload-destination" class="text-primary font-semibold">/</span></p>
+    </div>
+
+    <!-- Drop Zone -->
+    <div id="dropzone" class="border-2 border-dashed border-border rounded-2xl p-12 text-center hover:border-primary transition cursor-pointer bg-background">
+      <input type="file" id="fileInput" multiple class="hidden" accept=".html,.htm,.css,.js,.png,.jpg,.jpeg,.gif,.svg,.webp">
+      <svg class="w-16 h-16 text-muted mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+      </svg>
+      <p class="text-primary font-semibold mb-2">Glissez-déposez vos fichiers ici</p>
+      <p class="text-muted text-sm">ou cliquez pour sélectionner</p>
+      <p class="text-muted text-xs mt-2">HTML, CSS, JS, Images (PNG, JPG, SVG, etc.)</p>
+    </div>
+
+    <!-- File List -->
+    <div id="file-list" class="mt-6 space-y-2 max-h-60 overflow-y-auto"></div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3 mt-6">
+      <button id="btnCancelUpload" class="px-6 py-3 rounded-xl border border-border text-muted hover:text-primary hover:border-primary transition font-semibold">
+        Annuler
+      </button>
+      <button id="uploadButton" class="flex-1 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+        Uploader <span id="file-count"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Create Folder -->
+<div id="createFolderModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  <div class="bg-card rounded-3xl p-6 md:p-8 max-w-md w-full border border-border">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h3 class="text-2xl font-bold">Nouveau dossier</h3>
+        <p class="text-muted text-sm mt-1">Créer un nouveau dossier dans la librairie</p>
+      </div>
+      <button id="btnCloseFolder" class="text-muted hover:text-primary transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="mb-4 p-3 bg-background rounded-xl border border-border">
+      <p class="text-sm text-muted">Emplacement: <span id="folder-destination" class="text-primary font-semibold">/</span></p>
+    </div>
+
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-primary">Nom du dossier</label>
+        <input 
+          type="text" 
+          id="folderName"
+          placeholder="Ex: images, css, assets..." 
+          class="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 text-primary placeholder:text-muted"
+        >
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="closeCreateFolderModal()" class="px-6 py-3 rounded-xl border border-border text-muted hover:text-primary hover:border-primary transition font-semibold">
+          Annuler
+        </button>
+        <button type="button" onclick="createFolder()" class="flex-1 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition">
+          Créer le dossier
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+console.log('🟢 SCRIPT STARTED - Library details page');
+
+// Initialiser les variables globales
+window.currentPath = '/';
+window.selectedFiles = [];
+window.fileSystem = { '/': { folders: [], files: [] } };
+
+console.log('🟢 Variables initialized');
+console.log('🟢 Current path:', window.currentPath);
+
+// ID de la librairie (passé par EJS)
+window.libraryId = '<%= library.id %>';
+
+// Navigation
+window.navigateToFolder = function(path, pushHistory = true) {
+  console.log('📂 Navigating to:', path, 'pushHistory:', pushHistory);
+  window.currentPath = path;
+  
+  // Mettre à jour l'URL dans la barre d'adresse (si ce n'est pas une navigation depuis popstate)
+  if (pushHistory) {
+    var newUrl = '/libraries/' + window.libraryId;
+    if (path !== '/') {
+      // URLs propres : /libraries/1/images au lieu de /libraries/1?path=/images
+      newUrl += path; // path commence déjà par /
+    }
+    history.pushState({ path: path }, '', newUrl);
+  }
+  
+  fetch('/libraries/' + window.libraryId + '/structure?path=' + encodeURIComponent(path))
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      if (data.success) {
+        console.log('✅ Folder content loaded:', data.structure);
+        // Mettre à jour la structure pour ce chemin
+        window.fileSystem[path] = data.structure;
+        window.renderFileBrowser();
+        window.updateBreadcrumb();
+      } else {
+        console.error('❌ Failed to load folder:', data.message);
+      }
+    })
+    .catch(function(error) {
+      console.error('❌ Error loading folder:', error);
+    });
+};
+
+// Gestion du bouton retour/avant du navigateur
+window.addEventListener('popstate', function(event) {
+  console.log('📂 Popstate event:', event.state);
+  var path = '/';
+  if (event.state && event.state.path) {
+    path = event.state.path;
+  } else {
+    // Essayer de lire le path depuis l'URL (format: /libraries/1/images/subfolder)
+    var pathMatch = window.location.pathname.match(/^\/libraries\/\d+(.*)$/);
+    path = (pathMatch && pathMatch[1]) ? pathMatch[1] : '/';
+    if (path === '') path = '/';
+  }
+  window.navigateToFolder(path, false); // false = ne pas ajouter à l'historique
+});
+
+window.updateBreadcrumb = function() {
+  const breadcrumb = document.getElementById('breadcrumb-path');
+  
+  if (window.currentPath === '/') {
+    breadcrumb.innerHTML = '';
+  } else {
+    const parts = window.currentPath.split('/').filter(p => p);
+    breadcrumb.innerHTML = parts.map((part, index) => {
+      const path = '/' + parts.slice(0, index + 1).join('/');
+      return `<span class="text-muted"> / </span><button onclick="navigateToFolder('${path}')" 
+              class="breadcrumb-item text-primary hover:underline px-2 py-1 rounded transition"
+              data-path="${path}"
+              ondragover="handleBreadcrumbDragOver(event)"
+              ondrop="handleBreadcrumbDrop(event)"
+              ondragleave="handleBreadcrumbDragLeave(event)">${part}</button>`;
+    }).join('');
+  }
+};
+
+// Mettre à jour les statistiques depuis le serveur
+window.updateStats = function() {
+  var libraryId = window.location.pathname.split('/').pop();
+  
+  fetch('/libraries/' + libraryId + '/stats')
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      if (data.success) {
+        console.log('📊 Stats loaded:', data.stats);
+        document.getElementById('total-files').textContent = data.stats.totalFiles;
+        document.getElementById('html-count').textContent = data.stats.htmlCount;
+        document.getElementById('cssjs-count').textContent = data.stats.cssjsCount;
+        document.getElementById('img-count').textContent = data.stats.imgCount;
+      }
+    })
+    .catch(function(error) {
+      console.error('❌ Error loading stats:', error);
+    });
+};
+
+// Render file browser
+window.renderFileBrowser = function() {
+  console.log('🖼️ renderFileBrowser called');
+  console.log('🖼️ currentPath:', window.currentPath);
+  console.log('🖼️ fileSystem:', JSON.stringify(window.fileSystem));
+  
+  const browser = document.getElementById('file-browser');
+  const currentFolder = window.fileSystem[window.currentPath] || { folders: [], files: [] };
+  console.log('🖼️ currentFolder:', JSON.stringify(currentFolder));
+  
+  if (currentFolder.folders.length === 0 && currentFolder.files.length === 0) {
+    browser.innerHTML = `
+      <div class="text-center py-12 bg-background rounded-2xl border-2 border-dashed border-border transition-all">
+        <svg class="w-16 h-16 text-muted mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+        </svg>
+        <p class="text-muted mb-2 font-semibold">Ce dossier est vide</p>
+        <p class="text-muted text-sm mb-4">Glissez-déposez vos fichiers ici ou</p>
+        <button onclick="openUploadModal()" class="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition">
+          Ajouter des fichiers
+        </button>
+      </div>
+    `;
+    // Setup drag & drop même pour la zone vide
+    if (typeof window.setupFileBrowserDragDrop === 'function') {
+      window.setupFileBrowserDragDrop();
+    }
+    return;
+  }
+
+  let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">';
+  
+  // Folders
+  currentFolder.folders.forEach(folder => {
+    html += `
+      <div class="folder-item bg-background border border-border rounded-xl p-4 hover:border-primary/50 hover:shadow-md transition group relative"
+           draggable="true"
+           data-type="folder"
+           data-name="${folder.name}"
+           ondragstart="handleDragStart(event)"
+           ondragover="handleDragOver(event)"
+           ondrop="handleDrop(event)"
+           ondragleave="handleDragLeave(event)"
+           ondragend="handleDragEnd(event)">
+        <div onclick="navigateToFolder('${window.currentPath}${window.currentPath === '/' ? '' : '/'}${folder.name}')" class="flex items-start gap-3 cursor-pointer">
+          <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-100 transition">
+            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-sm truncate">${folder.name}</p>
+            <p class="text-muted text-xs">${folder.fileCount || 0} fichier(s)</p>
+          </div>
+        </div>
+        <button onclick="event.stopPropagation(); deleteFolder('${folder.name}', '${window.currentPath}')" class="absolute top-2 right-2 p-2 text-danger hover:bg-danger/10 rounded-lg transition opacity-0 group-hover:opacity-100" title="Supprimer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+      </div>
+    `;
+  });
+  
+  // Files
+  currentFolder.files.forEach(file => {
+    const icon = getFileIcon(file.type);
+    const isHtml = file.type === 'html' || file.type === 'htm';
+    const encodedPath = encodeURIComponent(window.currentPath + (window.currentPath === '/' ? '' : '/') + file.name);
+    
+    html += `
+      <div class="file-item bg-background border border-border rounded-xl p-4 hover:border-primary/30 transition group relative min-h-[110px] flex flex-col"
+           draggable="true"
+           data-type="file"
+           data-name="${file.name}"
+           ondragstart="handleDragStart(event)"
+           ondragend="handleDragEnd(event)">
+        <div class="flex items-start gap-3 mb-auto">
+          ${icon}
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-sm truncate">${file.name}</p>
+            <p class="text-muted text-xs">${file.type} · ${file.size || 'N/A'}</p>
+          </div>
+        </div>
+        <div class="absolute top-2 right-2 flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onclick="deleteFile('${file.name}', '${window.currentPath}')" class="p-2 text-danger hover:bg-danger/10 rounded-lg transition" title="Supprimer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+          <button onclick="downloadFile('${file.name}', '${window.currentPath}')" class="p-2 rounded-lg text-primary hover:bg-primary/10 transition" title="Télécharger">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+          </button>
+          ${isHtml ? `
+            <button onclick="window.location.href='/libraries/${window.libraryId}/editor/${encodedPath}'" class="p-2 rounded-lg text-purple-600 hover:bg-purple-50 transition" title="Éditeur IA">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+              </svg>
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  console.log('🖼️ HTML generated, folders count:', currentFolder.folders.length);
+  console.log('🖼️ Browser element:', browser);
+  browser.innerHTML = html;
+  console.log('🖼️ HTML injected successfully');
+  
+  // Setup drag & drop après le rendu
+  if (typeof window.setupFileBrowserDragDrop === 'function') {
+    window.setupFileBrowserDragDrop();
+  }
+};
+
+function getFileIcon(type) {
+  const icons = {
+    'html': '<div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>',
+    'css': '<div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg></div>',
+    'js': '<div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>',
+    'default': '<div class="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>'
+  };
+  
+  if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'image', 'img'].includes(type)) {
+    return '<div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>';
+  }
+  
+  return icons[type] || icons['default'];
+}
+
+// === Drag & Drop pour déplacer fichiers et dossiers ===
+let draggedItem = null;
+
+window.handleDragStart = function(e) {
+  draggedItem = {
+    type: e.currentTarget.dataset.type,
+    name: e.currentTarget.dataset.name,
+    currentPath: window.currentPath
+  };
+  e.currentTarget.style.opacity = '0.5';
+  e.dataTransfer.effectAllowed = 'move';
+  console.log('🎯 Drag started:', draggedItem);
+};
+
+window.handleDragEnd = function(e) {
+  e.currentTarget.style.opacity = '1';
+  // Nettoyer tous les effets visuels
+  document.querySelectorAll('.folder-item').forEach(el => {
+    el.classList.remove('drag-over');
+  });
+};
+
+window.handleDragOver = function(e) {
+  if (e.preventDefault) e.preventDefault();
+  
+  // Ne permettre le drop que sur les dossiers
+  if (e.currentTarget.dataset.type === 'folder') {
+    e.currentTarget.classList.add('drag-over');
+    e.dataTransfer.dropEffect = 'move';
+  }
+  
+  return false;
+};
+
+window.handleDragLeave = function(e) {
+  e.currentTarget.classList.remove('drag-over');
+};
+
+window.handleDrop = function(e) {
+  if (e.stopPropagation) e.stopPropagation();
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  
+  const targetFolder = e.currentTarget.dataset.name;
+  
+  // Empêcher de déplacer dans soi-même
+  if (draggedItem.type === 'folder' && draggedItem.name === targetFolder) {
+    console.log('❌ Cannot move folder into itself');
+    return false;
+  }
+  
+  // Construire le chemin de destination
+  const targetPath = window.currentPath + (window.currentPath === '/' ? '' : '/') + targetFolder;
+  
+  console.log('📦 Dropping:', draggedItem, 'into:', targetPath);
+  
+  // Appel API pour déplacer
+  moveItem(draggedItem, targetPath);
+  
+  return false;
+};
+
+// === Gestion du drop sur le breadcrumb ===
+window.handleBreadcrumbDragOver = function(e) {
+  if (e.preventDefault) e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+  e.dataTransfer.dropEffect = 'move';
+  return false;
+};
+
+window.handleBreadcrumbDragLeave = function(e) {
+  e.currentTarget.style.backgroundColor = '';
+};
+
+window.handleBreadcrumbDrop = function(e) {
+  if (e.stopPropagation) e.stopPropagation();
+  e.preventDefault();
+  e.currentTarget.style.backgroundColor = '';
+  
+  // Récupérer le chemin de destination depuis l'attribut data-path
+  const targetPath = e.currentTarget.dataset.path;
+  
+  console.log('📦 Dropping into breadcrumb path:', targetPath);
+  
+  // Appel API pour déplacer
+  moveItem(draggedItem, targetPath);
+  
+  return false;
+};
+
+function moveItem(item, targetPath) {
+  const libraryId = window.libraryId;
+  
+  fetch('/libraries/' + libraryId + '/move', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      itemType: item.type,
+      itemName: item.name,
+      sourcePath: item.currentPath,
+      targetPath: targetPath
+    })
+  })
+  .then(function(response) { return response.json(); })
+  .then(function(data) {
+    if (data.success) {
+      console.log('✅ Item moved successfully');
+      // Recharger la vue actuelle
+      window.navigateToFolder(window.currentPath, false);
+    } else {
+      alert('Erreur: ' + data.message);
+      console.error('❌ Error:', data.message);
+    }
+  })
+  .catch(function(error) {
+    console.error('❌ Error moving item:', error);
+    alert('Erreur lors du déplacement');
+  });
+}
+
+// Note: Les fonctions openUploadModal, closeUploadModal, openCreateFolderModal, closeCreateFolderModal
+// sont définies dans le script en haut du fichier pour être disponibles immédiatement
+
+// Dropzone setup function
+function setupDropzone() {
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  
+  if (!dropzone || !fileInput) {
+    console.error('Dropzone or file input not found');
+    return;
+  }
+  
+  dropzone.addEventListener('click', () => fileInput.click());
+  
+  fileInput.addEventListener('change', (e) => {
+    handleFiles(e.target.files);
+  });
+  
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('border-primary', 'bg-primary/5');
+  });
+  
+  dropzone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('border-primary', 'bg-primary/5');
+  });
+  
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('border-primary', 'bg-primary/5');
+    handleFiles(e.dataTransfer.files);
+  });
+  
+  console.log('✅ Dropzone setup complete');
+}
+
+function handleFiles(files) {
+  window.selectedFiles = Array.from(files);
+  renderFileList();
+  updateUploadButton();
+}
+
+function renderFileList() {
+  const fileList = document.getElementById('file-list');
+  fileList.innerHTML = window.selectedFiles.map((file, index) => `
+    <div class="flex items-center justify-between p-3 bg-background rounded-xl border border-border">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
+        <svg class="w-5 h-5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium truncate">${file.name}</p>
+          <p class="text-xs text-muted">${(file.size / 1024).toFixed(2)} KB</p>
+        </div>
+      </div>
+      <button onclick="removeFile(${index})" class="text-danger hover:text-danger/80 ml-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function removeFile(index) {
+  window.selectedFiles.splice(index, 1);
+  renderFileList();
+  updateUploadButton();
+}
+
+function updateUploadButton() {
+  const button = document.getElementById('uploadButton');
+  const count = document.getElementById('file-count');
+  
+  if (window.selectedFiles.length > 0) {
+    button.disabled = false;
+    count.textContent = `(${window.selectedFiles.length})`;
+  } else {
+    button.disabled = true;
+    count.textContent = '';
+  }
+}
+
+// Note: uploadFiles est défini dans head.ejs avec l'appel API réel
+
+// Note: createFolder est défini dans head.ejs avec l'appel API réel
+
+// Note: deleteFile et deleteFolder sont définis dans head.ejs avec les appels API réels
+
+// Initialisation au chargement du DOM
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🔵 DOM loaded, attaching event listeners...');
+  
+  // Boutons principaux
+  const btnUploadFiles = document.getElementById('btnUploadFiles');
+  const btnCreateFolder = document.getElementById('btnCreateFolder');
+  const btnAddFiles = document.getElementById('btnAddFiles');
+  
+  console.log('🔍 Recherche des boutons...');
+  console.log('btnUploadFiles:', btnUploadFiles);
+  console.log('btnCreateFolder:', btnCreateFolder);
+  console.log('btnAddFiles:', btnAddFiles);
+  
+  if (btnUploadFiles) {
+    btnUploadFiles.addEventListener('click', function(e) {
+      console.log('🔵 Clic sur btnUploadFiles détecté');
+      openUploadModal();
+    });
+    console.log('✅ btnUploadFiles listener attached');
+  } else {
+    console.error('❌ btnUploadFiles not found');
+  }
+  
+  if (btnCreateFolder) {
+    btnCreateFolder.addEventListener('click', function(e) {
+      console.log('🔵 Clic sur btnCreateFolder détecté');
+      e.preventDefault();
+      e.stopPropagation();
+      openCreateFolderModal();
+    });
+    console.log('✅ btnCreateFolder listener attached');
+  } else {
+    console.error('❌ btnCreateFolder not found');
+  }
+  
+  if (btnAddFiles) {
+    btnAddFiles.addEventListener('click', function(e) {
+      console.log('🔵 Clic sur btnAddFiles détecté');
+      openUploadModal();
+    });
+    console.log('✅ btnAddFiles listener attached');
+  } else {
+    console.error('❌ btnAddFiles not found');
+  }
+  
+  // Boutons de fermeture des modaux
+  const btnCloseUpload = document.getElementById('btnCloseUpload');
+  const btnCancelUpload = document.getElementById('btnCancelUpload');
+  const btnCloseFolder = document.getElementById('btnCloseFolder');
+  const btnCancelFolder = document.getElementById('btnCancelFolder');
+  const btnConfirmFolder = document.getElementById('btnConfirmFolder');
+  const uploadButton = document.getElementById('uploadButton');
+  
+  if (btnCloseUpload) btnCloseUpload.addEventListener('click', closeUploadModal);
+  if (btnCancelUpload) btnCancelUpload.addEventListener('click', closeUploadModal);
+  if (btnCloseFolder) btnCloseFolder.addEventListener('click', closeCreateFolderModal);
+  if (btnCancelFolder) btnCancelFolder.addEventListener('click', closeCreateFolderModal);
+  if (btnConfirmFolder) {
+    btnConfirmFolder.addEventListener('click', function(e) {
+      console.log('🔵 Clic sur btnConfirmFolder détecté');
+      e.preventDefault();
+      e.stopPropagation();
+      createFolder();
+    });
+  }
+  if (uploadButton) {
+    uploadButton.addEventListener('click', function(e) {
+      console.log('🔵 Clic sur uploadButton détecté');
+      e.preventDefault();
+      e.stopPropagation();
+      // Appeler la fonction uploadFiles de head.ejs avec les bons paramètres
+      if (typeof window.uploadFiles === 'function' && window.selectedFiles && window.selectedFiles.length > 0) {
+        window.uploadFiles(window.selectedFiles, window.currentPath);
+        closeUploadModal();
+      } else {
+        alert('Veuillez sélectionner des fichiers');
+      }
+    });
+  }
+  
+  console.log('✅ All event listeners attached');
+  
+  // Setup dropzone
+  setupDropzone();
+  
+  // Chemin initial fourni par le serveur (via l'URL propre)
+  var initialPath = '<%= initialPath || "/" %>';
+  window.currentPath = initialPath;
+  console.log('🔍 Initial path from server:', initialPath);
+  
+  // Stocker l'état initial dans l'historique (pour que le premier "retour" fonctionne)
+  history.replaceState({ path: initialPath }, '', window.location.href);
+  
+  // Charger la structure depuis le serveur
+  console.log('🔍 Checking if loadLibraryStructure exists:', typeof window.loadLibraryStructure);
+  
+  if (typeof window.loadLibraryStructure === 'function') {
+    console.log('📁 Calling loadLibraryStructure with path:', initialPath);
+    // Passer renderFileBrowser comme callback et le chemin initial
+    window.loadLibraryStructure(function() {
+      console.log('📁 Structure loaded, rendering browser...');
+      window.updateStats();
+      // Si on a un chemin initial différent de la racine, naviguer vers ce dossier
+      if (initialPath !== '/') {
+        window.navigateToFolder(initialPath, false);
+      } else {
+        window.renderFileBrowser();
+        window.updateBreadcrumb();
+      }
+    });
+  } else {
+    console.error('❌ loadLibraryStructure is not defined!');
+    // Fallback: naviguer vers le chemin initial
+    window.navigateToFolder(initialPath, false);
+  }
+  
+  console.log('✅ File browser initialized');
+});
+
+// Fonction pour télécharger un fichier individuel
+window.downloadFile = function(fileName, filePath) {
+  const downloadUrl = `/libraries/${window.libraryId}/download/file?path=${encodeURIComponent(filePath)}&fileName=${encodeURIComponent(fileName)}`;
+  window.location.href = downloadUrl;
+};
+
+// Fonction pour télécharger toute la bibliothèque en ZIP
+window.downloadAll = function() {
+  const downloadUrl = `/libraries/${window.libraryId}/download/all`;
+  window.location.href = downloadUrl;
+};
+</script>

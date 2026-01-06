@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<%- include('../partials/head') %>
+<body class="bg-background text-primary min-h-screen">
+  <div class="flex">
+    <%- include('../partials/sidebar') %>
+    
+    <main class="flex-1 md:ml-64 p-4 md:p-8">
+      <%- include('../partials/header') %>
+      
+      <!-- Flash messages -->
+      <%- include('../partials/flash') %>
+      
+      <!-- Contenu de la page injecté ici -->
+      <%- body %>
+    </main>
+  </div>
+  
+  <%- include('../partials/scripts') %>
+</body>
+</html>
+

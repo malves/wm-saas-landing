@@ -1,0 +1,93 @@
+<div class="w-full max-w-md space-y-8">
+  <div class="space-y-2">
+    <h1 class="text-3xl sm:text-4xl font-bold text-center">Connectez-vous à votre espace</h1>
+  </div>
+
+  <!-- Flash messages -->
+  <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+    <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+      <ul class="list-disc list-inside text-red-800 text-sm">
+        <% errors.forEach(error => { %>
+          <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <div class="grid grid-cols-2 gap-4">
+    <button class="flex items-center justify-center gap-3 py-3 rounded-xl bg-[#F4F5F7] hover:bg-[#eceef1] transition border border-transparent">
+      <div class="w-6 h-6 rounded-full border border-primary/20 flex items-center justify-center">
+        <span class="font-bold text-lg">G</span>
+      </div>
+      <span class="font-semibold">Google</span>
+    </button>
+    <button class="flex items-center justify-center gap-3 py-3 rounded-xl bg-[#F4F5F7] hover:bg-[#eceef1] transition border border-transparent">
+        <div class="w-6 h-6 rounded-full border border-primary/20 flex items-center justify-center">
+            <span class="font-bold text-lg">F</span>
+          </div>
+      <span class="font-semibold">Facebook</span>
+    </button>
+  </div>
+
+  <div class="flex items-center gap-4 text-muted text-sm font-medium">
+    <span class="flex-1 h-px bg-border"></span>
+    <span>ou</span>
+    <span class="flex-1 h-px bg-border"></span>
+  </div>
+
+  <form method="POST" action="/auth/login" class="space-y-4">
+    <div class="space-y-2">
+      <label class="block text-muted text-sm font-semibold tracking-wide">Email professionnel</label>
+      <div class="flex items-center gap-3 bg-[#F4F5F7] rounded-xl px-4 py-3 border border-transparent focus-within:bg-white focus-within:border-border transition">
+        <svg class="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+        <input 
+          type="email" 
+          name="email" 
+          value="<%= typeof formData !== 'undefined' ? (formData.email || '') : '' %>"
+          placeholder="prenom@entreprise.com" 
+          class="flex-1 bg-transparent outline-none text-primary placeholder:text-muted"
+          required
+        >
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-muted text-sm font-semibold tracking-wide">Mot de passe</label>
+      <div class="flex items-center gap-3 bg-[#F4F5F7] rounded-xl px-4 py-3 border border-transparent focus-within:bg-white focus-within:border-border transition">
+        <svg class="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+        <input 
+          type="password" 
+          name="password" 
+          placeholder="••••••••" 
+          class="flex-1 bg-transparent outline-none text-primary placeholder:text-muted"
+          required
+        >
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-sm">
+      <label class="flex items-center gap-2 text-muted cursor-pointer">
+        <input type="checkbox" class="w-4 h-4 rounded border-border text-primary">
+        <span>Se souvenir de moi</span>
+      </label>
+      <a href="/auth/forgot" class="text-primary font-semibold hover:underline">Mot de passe oublié ?</a>
+    </div>
+
+    <button 
+      type="submit" 
+      class="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary/90 transition"
+    >
+      Se connecter
+    </button>
+  </form>
+
+  <p class="text-center text-muted text-sm">
+    Pas encore de compte ? 
+    <a href="/auth/register" class="text-primary font-semibold hover:underline">Créer un compte</a>
+  </p>
+</div>
+

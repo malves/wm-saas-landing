@@ -1,0 +1,172 @@
+<!-- Mobile Header -->
+<div class="md:hidden flex items-center justify-between mb-6">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+    </div>
+    <span class="text-xl font-bold">Landing Hub</span>
+  </div>
+  <button id="mobile-menu-toggle" class="p-2 text-muted hover:text-primary transition">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Header Desktop -->
+<div class="hidden md:flex items-center justify-between gap-4 mb-8">
+  <div class="relative flex-1 max-w-4xl">
+    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted z-10">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
+      </svg>
+    </span>
+    <input
+      id="global-search-input"
+      type="text"
+      placeholder="Rechercher une campagne ou un lead"
+      class="w-full h-14 bg-[#e8eaec] border border-[#e6e8ec] rounded-[18px] pl-14 pr-5 text-sm text-primary placeholder:text-muted shadow-[0_14px_45px_-26px_rgba(20,20,22,0.65)] focus:outline-none focus:border-[#d7d9dd] focus:ring-2 focus:ring-primary/12 transition-colors"
+      autocomplete="off"
+    >
+    
+    <!-- Popin de résultats de recherche -->
+    <div id="search-results-popup" class="hidden absolute top-full mt-2 w-full bg-white rounded-2xl shadow-2xl border border-border z-50 max-h-[600px] overflow-y-auto">
+      <!-- En-tête avec filtres et export -->
+      <div id="search-header" class="hidden sticky top-0 bg-white border-b border-border p-3 flex items-center justify-between gap-2 z-10">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button data-filter="all" class="search-filter-btn active px-3 py-1.5 text-xs font-semibold rounded-lg transition bg-primary text-white">
+            Tout
+          </button>
+          <button data-filter="leads" class="search-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition bg-blue-50 text-blue-700 hover:bg-blue-100">
+            Leads
+          </button>
+          <button data-filter="campaigns" class="search-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition bg-green-50 text-green-700 hover:bg-green-100">
+            Campagnes
+          </button>
+          <button data-filter="templates" class="search-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition bg-orange-50 text-orange-700 hover:bg-orange-100">
+            Templates
+          </button>
+          <button data-filter="users" class="search-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition bg-purple-50 text-purple-700 hover:bg-purple-100">
+            Utilisateurs
+          </button>
+        </div>
+        <button id="export-csv-btn" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Export CSV
+        </button>
+      </div>
+      <!-- Contenu dynamique injecté par JavaScript -->
+      <div id="search-results-content"></div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <div class="relative">
+      <button id="notif-toggle" class="w-11 h-11 rounded-2xl bg-white border border-border flex items-center justify-center text-primary hover:-translate-y-0.5 transition shadow-sm relative">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-5-5.916V4a1 1 0 10-2 0v1.084A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+        <span class="absolute -top-1 -right-1 inline-flex w-3 h-3 bg-success rounded-full ring-2 ring-white"></span>
+      </button>
+
+      <!-- Notification popup -->
+      <div id="notif-panel" class="hidden absolute right-0 mt-3 w-[380px] bg-white rounded-2xl shadow-xl border border-border/70 z-20">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-border/70">
+          <div class="font-semibold text-primary">Notifications</div>
+          <button class="text-sm text-muted hover:text-primary font-medium">Tout marquer comme lu</button>
+        </div>
+        <div class="max-h-[420px] overflow-y-auto divide-y divide-border/60">
+          <div class="flex items-start gap-3 px-5 py-4">
+            <span class="text-success mt-1">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+            </span>
+            <div class="flex-1 space-y-1">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-semibold text-primary">Conversion en hausse</p>
+                <span class="text-[11px] text-muted">09 Oct 2022, 11:30</span>
+              </div>
+              <p class="text-sm text-muted">Landing page "Promo Été" a atteint 12% de conversion.</p>
+              <button class="text-xs text-primary font-semibold border border-border px-3 py-1 rounded-lg">Voir le dashboard</button>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 px-5 py-4">
+            <span class="text-primary mt-1">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z"/></svg>
+            </span>
+            <div class="flex-1 space-y-1">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-semibold text-primary">Nouveaux leads collectés</p>
+                <span class="text-[11px] text-muted">07 Oct 2022, 10:30</span>
+              </div>
+              <p class="text-sm text-muted">250 leads ajoutés via "Contact Pro".</p>
+              <span class="inline-flex items-center gap-1 text-xs text-primary font-semibold bg-primary/5 px-3 py-1 rounded-lg">Leads</span>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 px-5 py-4">
+            <span class="text-success mt-1">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+            </span>
+            <div class="flex-1 space-y-1">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-semibold text-primary">Page publiée</p>
+                <span class="text-[11px] text-muted">06 Oct 2022, 23:44</span>
+              </div>
+              <p class="text-sm text-muted">"Offre d'automne" est maintenant en ligne.</p>
+              <button class="text-xs text-primary font-semibold border border-border px-3 py-1 rounded-lg">Voir les stats</button>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 px-5 py-4">
+            <span class="text-primary mt-1">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z"/></svg>
+            </span>
+            <div class="flex-1 space-y-1">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-semibold text-primary">Pic de trafic</p>
+                <span class="text-[11px] text-muted">05 Oct 2022, 14:17</span>
+              </div>
+              <p class="text-sm text-muted">Landing page "Webinar" a reçu 1 238 visiteurs.</p>
+              <span class="inline-flex items-center gap-1 text-xs text-primary font-semibold bg-primary/5 px-3 py-1 rounded-lg">Analytics</span>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 py-3 border-t border-border/70 text-sm text-primary font-semibold hover:bg-background transition cursor-pointer">
+          Voir toutes les notifications
+        </div>
+      </div>
+    </div>
+
+    <div class="relative">
+      <button id="user-menu-toggle" class="flex items-center gap-3 bg-white border border-border rounded-2xl px-3 py-2 shadow-sm hover:border-primary hover:bg-gray-50 transition cursor-pointer group">
+        <div class="w-10 h-10 rounded-2xl bg-primary text-white flex items-center justify-center font-bold group-hover:bg-primary/90 transition">
+          <%= user ? user.name.substring(0, 2).toUpperCase() : 'U' %>
+        </div>
+        <div class="text-left">
+          <p class="text-sm font-semibold leading-tight group-hover:text-primary transition"><%= user ? user.name : 'Utilisateur' %></p>
+          <p class="text-xs text-muted group-hover:text-primary/70 transition"><%= user ? user.role : '' %></p>
+        </div>
+        <svg class="w-4 h-4 text-muted group-hover:text-primary transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+
+      <div id="user-menu-panel" class="hidden absolute right-0 mt-2 w-48 bg-white border border-border rounded-xl shadow-lg z-30">
+        <a href="/profile" class="flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-background transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Mon profil
+        </a>
+        <a href="/auth/logout" class="flex items-center gap-2 px-4 py-2 text-sm text-danger hover:bg-red-50 transition border-t border-border/60">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Déconnexion
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<%- include('../partials/head') %>
+<body class="bg-background text-primary min-h-screen">
+  <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+    <!-- Colonne gauche - Formulaire -->
+    <section class="relative bg-white flex flex-col px-8 sm:px-14 py-8">
+      <div class="absolute left-8 top-8">
+        <a href="/auth/login">
+          <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex-1 flex items-center justify-center">
+        <!-- Contenu de la page injecté ici -->
+        <%- body %>
+      </div>
+    </section>
+
+    <!-- Colonne droite - Illustration -->
+    <section class="hidden lg:flex bg-primary relative overflow-hidden">
+      <div class="absolute inset-0 opacity-20">
+        <div class="absolute right-20 top-20 w-64 h-64 bg-white/30 rounded-3xl rotate-12"></div>
+        <div class="absolute right-40 bottom-20 w-48 h-48 bg-white/20 rounded-full"></div>
+        <div class="absolute right-60 top-40 w-32 h-32 bg-white/10 rounded-2xl -rotate-12"></div>
+      </div>
+      <div class="relative z-10 flex items-center justify-center w-full p-12">
+        <div class="text-white text-center space-y-6">
+          <h2 class="text-4xl font-bold">Landing Hub</h2>
+          <p class="text-xl text-white/80">Créez des landing pages performantes et collectez des leads</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,171 @@
+<script src="/js/notifications.js"></script>
+
+<script>
+  // Dropdown menu pour les actions
+  (function() {
+    const menuTimeouts = new WeakMap();
+
+    function hideMenu(menu) {
+      if (!menu) return;
+      menu.style.display = 'none';
+      if (menuTimeouts.has(menu)) {
+        clearTimeout(menuTimeouts.get(menu));
+        menuTimeouts.delete(menu);
+      }
+    }
+
+    function showMenu(menu) {
+      if (!menu) return;
+      menu.style.display = 'block';
+    }
+
+    function scheduleHide(menu) {
+      if (!menu) return;
+      if (menuTimeouts.has(menu)) {
+        clearTimeout(menuTimeouts.get(menu));
+      }
+      const timeoutId = setTimeout(() => hideMenu(menu), 600);
+      menuTimeouts.set(menu, timeoutId);
+    }
+
+    function cancelScheduledHide(menu) {
+      if (!menu) return;
+      if (menuTimeouts.has(menu)) {
+        clearTimeout(menuTimeouts.get(menu));
+        menuTimeouts.delete(menu);
+      }
+    }
+
+    // Exposer la fonction toggle globalement
+    window.toggleActionMenu = function(button, event) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      const menu = button.nextElementSibling;
+      if (!menu) return;
+
+      // Fermer tous les autres menus
+      document.querySelectorAll('.action-menu').forEach(otherMenu => {
+        if (otherMenu !== menu) {
+          hideMenu(otherMenu);
+        }
+      });
+
+      // Toggle ce menu
+      if (menu.style.display === 'block') {
+        hideMenu(menu);
+      } else {
+        showMenu(menu);
+        cancelScheduledHide(menu);
+      }
+    };
+
+    // Fermer quand on clique ailleurs
+    document.addEventListener('click', function() {
+      document.querySelectorAll('.action-menu').forEach(menu => hideMenu(menu));
+    });
+
+    // Ajouter les événements de survol quand le DOM est prêt
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMenuHoverEvents);
+    } else {
+      initMenuHoverEvents();
+    }
+
+    function initMenuHoverEvents() {
+      document.querySelectorAll('.action-menu').forEach(menu => {
+        menu.addEventListener('mouseenter', () => cancelScheduledHide(menu));
+        menu.addEventListener('mouseleave', () => scheduleHide(menu));
+      });
+    }
+  })();
+</script>
+
+<script>
+  // Menu utilisateur (profil / logout)
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('user-menu-toggle');
+    const panel = document.getElementById('user-menu-panel');
+
+    if (toggle && panel) {
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        panel.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+          panel.classList.add('hidden');
+        }
+      });
+    }
+  });
+</script>
+
+<script>
+  // Menu mobile (sidebar)
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuToggle = document.getElementById('mobile-menu-toggle');
+    const sidebar = document.getElementById('mobile-sidebar');
+    const sidebarClose = document.getElementById('mobile-sidebar-close');
+    
+    // Créer l'overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'mobile-sidebar-overlay';
+    overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden';
+    document.body.appendChild(overlay);
+
+    // Fonction pour ouvrir la sidebar
+    function openSidebar() {
+      if (sidebar && overlay) {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Empêcher le scroll
+      }
+    }
+
+    // Fonction pour fermer la sidebar
+    function closeSidebar() {
+      if (sidebar && overlay) {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex');
+        overlay.classList.add('hidden');
+        document.body.style.overflow = ''; // Réactiver le scroll
+      }
+    }
+
+    // Ouvrir avec le bouton burger
+    if (menuToggle) {
+      menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSidebar();
+      });
+    }
+
+    // Fermer avec le bouton X
+    if (sidebarClose) {
+      sidebarClose.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeSidebar();
+      });
+    }
+
+    // Fermer avec l'overlay
+    if (overlay) {
+      overlay.addEventListener('click', closeSidebar);
+    }
+
+    // Fermer avec Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !sidebar.classList.contains('hidden')) {
+        closeSidebar();
+      }
+    });
+  });
+</script>
+
+<!-- Chart.js pour les graphiques de landing pages -->
+<script src="/js/chart.umd.min.js"></script>
+<script src="/js/landingpage-chart.js"></script>
+

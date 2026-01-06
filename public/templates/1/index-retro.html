@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELECTRIC NIGHT // The Future is Electric</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff007f;
+            --neon-blue: #00bfff;
+            --neon-purple: #bf00ff;
+            --neon-green: #39ff14;
+            --neon-orange: #ff6600;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --grid: #1a1a1a;
+            --text: #ffffff;
+            --text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--darker);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        /* Grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(255, 0, 127, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 191, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Neon glow animations */
+        @keyframes neonGlow {
+            0%, 100% { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor; }
+            50% { text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor; }
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .neon-glow {
+            animation: neonGlow 2s infinite;
+        }
+
+        .flicker {
+            animation: flicker 3s infinite;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 3rem;
+            background: rgba(5, 5, 5, 0.9);
+            border-bottom: 2px solid var(--neon-pink);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--neon-pink);
+            text-shadow: var(--text-shadow);
+            letter-spacing: 3px;
+            animation: neonGlow 3s infinite;
+        }
+
+        .logo span {
+            color: var(--neon-blue);
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: var(--neon-green);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--neon-orange);
+            text-shadow: 0 0 10px var(--neon-orange);
+        }
+
+        .header-btn {
+            background: var(--neon-purple);
+            border: 2px solid var(--neon-purple);
+            color: var(--text);
+            padding: 0.8rem 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px var(--text);
+        }
+
+        .header-btn:hover {
+            background: transparent;
+            box-shadow: 0 0 20px var(--neon-purple);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 140px 3rem 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(255, 0, 127, 0.1) 0%, transparent 40%),
+                        radial-gradient(ellipse at 70% 80%, rgba(0, 191, 255, 0.08) 0%, transparent 40%),
+                        linear-gradient(180deg, var(--darker) 0%, var(--dark) 100%);
+            z-index: -1;
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--neon-green);
+            animation: scanline 4s linear infinite;
+            z-index: 0;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(3.5rem, 6vw, 5.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .hero-text h1 .line1 {
+            color: var(--neon-pink);
+            text-shadow: var(--text-shadow);
+            animation: neonGlow 4s infinite;
+        }
+
+        .hero-text h1 .line2 {
+            color: var(--neon-blue);
+            text-shadow: var(--text-shadow);
+            animation: neonGlow 4s infinite 2s;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3rem;
+            max-width: 500px;
+            letter-spacing: 1px;
+        }
+
+        .retro-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .retro-stat {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--neon-green);
+            padding: 1.5rem;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--neon-orange);
+            text-shadow: 0 0 10px var(--neon-orange);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--neon-green);
+        }
+
+        /* Hero Form */
+        .hero-form {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--neon-blue);
+            padding: 3rem;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-form::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue), var(--neon-purple), var(--neon-green));
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(4px);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--neon-purple);
+            text-shadow: 0 0 10px var(--neon-purple);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-green);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
+            background: rgba(0, 191, 255, 0.05);
+        }
+
+        .form-submit {
+            width: 100%;
+            background: var(--neon-pink);
+            border: 2px solid var(--neon-pink);
+            color: var(--text);
+            padding: 1.2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            text-shadow: 0 0 5px var(--text);
+        }
+
+        .form-submit:hover {
+            background: transparent;
+            box-shadow: 0 0 30px var(--neon-pink);
+        }
+
+        .form-note {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        /* Features */
+        .features {
+            padding: 120px 3rem;
+            background: var(--dark);
+            position: relative;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--neon-orange);
+            text-shadow: 0 0 20px var(--neon-orange);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+            letter-spacing: 1px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-purple);
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-purple);
+            transition: width 0.4s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 30px rgba(191, 0, 255, 0.3);
+            transform: translateY(-10px);
+        }
+
+        .feature-card:hover::before {
+            width: 100%;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+            letter-spacing: 0.5px;
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 120px 3rem;
+            background: var(--darker);
+            position: relative;
+        }
+
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--neon-orange);
+            padding: 4rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta-container::before {
+            content: 'SYSTEM ONLINE';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--darker);
+            padding: 0 1rem;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: var(--neon-orange);
+            text-transform: uppercase;
+        }
+
+        .cta-container h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 20px var(--neon-pink);
+            margin-bottom: 1rem;
+        }
+
+        .cta-container p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 3rem;
+            letter-spacing: 1px;
+        }
+
+        .cta-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .cta-form .full {
+            grid-column: span 2;
+        }
+
+        .cta-submit {
+            grid-column: span 2;
+            background: var(--neon-green);
+            border: 2px solid var(--neon-green);
+            color: var(--dark);
+            padding: 1.2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            text-shadow: 0 0 5px var(--dark);
+        }
+
+        .cta-submit:hover {
+            background: transparent;
+            box-shadow: 0 0 30px var(--neon-green);
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 3rem;
+            background: var(--dark);
+            border-top: 1px solid var(--neon-pink);
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+            margin-bottom: 1rem;
+        }
+
+        footer p {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 4rem;
+            }
+
+            .hero-form {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .retro-stats {
+                justify-content: center;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+
+            .cta-form {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-form .full,
+            .cta-submit {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .retro-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .retro-stat {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            header {
+                padding: 1rem 2rem;
+            }
+
+            .hero {
+                padding: 120px 2rem 80px;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .features {
+                padding: 80px 2rem;
+            }
+
+            .cta-section {
+                padding: 80px 2rem;
+            }
+
+            .cta-container {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">ELECTRIC<span>NIGHT</span></div>
+            <div class="header-nav">
+                <a href="#features" class="nav-item">Features</a>
+                <button class="header-btn">Join Network</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>
+                    <span class="line1">The Future</span>
+                    <span class="line2">Is Electric</span>
+                </h1>
+                <p class="hero-subtitle">Enter the neon grid. Experience pure electric power in a world of infinite possibilities. Zero emissions, maximum performance.</p>
+
+                <div class="retro-stats">
+                    <div class="retro-stat">
+                        <span class="stat-value">650</span>
+                        <span class="stat-label">km range</span>
+                    </div>
+                    <div class="retro-stat">
+                        <span class="stat-value">2.9s</span>
+                        <span class="stat-label">0-100 km/h</span>
+                    </div>
+                    <div class="retro-stat">
+                        <span class="stat-value">0</span>
+                        <span class="stat-label">co2 emissions</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-form">
+                <div class="form-header">
+                    <h3>Access Terminal</h3>
+                    <p>Initialize your electric journey</p>
+                </div>
+                <form id="heroForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" class="form-input" name="prenom" placeholder="First Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-input" name="nom" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-input" name="email" placeholder="Email Address" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" class="form-input" name="telephone" placeholder="Phone Number" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" class="form-input" name="adresse" placeholder="Street Address">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-input" name="codepostal" placeholder="Postal Code" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="form-submit">Initialize System</button>
+                </form>
+                <p class="form-note">Your data is encrypted and secure in our quantum network</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>System Features</h2>
+            <p>Advanced capabilities for the electric revolution</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Quantum Drive</h3>
+                <p>Instant torque delivery. 0 to 100 km/h in 2.9 seconds. Feel the electric surge course through your veins.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔋</div>
+                <h3>Infinite Power</h3>
+                <p>650+ km range on a single charge. Recharge at hyper-speed stations. Never run out of power again.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Neural Defense</h3>
+                <p>AI-powered safety systems. Predictive collision avoidance. Your digital guardian on the road.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📡</div>
+                <h3>Grid Connection</h3>
+                <p>Seamless integration with smart cities. Real-time traffic optimization. Navigate the future.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3>Eco Protocol</h3>
+                <p>Zero carbon footprint. Clean energy revolution. Drive green, live clean, save the planet.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3>Luxury Matrix</h3>
+                <p>Premium materials, cutting-edge design. The electric vehicle that matches your lifestyle.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2>Connect to the Grid</h2>
+            <p>Join the electric revolution. Enter your coordinates to begin transmission.</p>
+            <form class="cta-form" id="ctaForm">
+                <input type="text" class="form-input" name="prenom" placeholder="First Name" required>
+                <input type="text" class="form-input" name="nom" placeholder="Last Name" required>
+                <input type="tel" class="form-input" name="telephone" placeholder="Phone Number" required>
+                <input type="email" class="form-input" name="email" placeholder="Email Address" required>
+                <input type="text" class="form-input full" name="adresse" placeholder="Street Address">
+                <input type="text" class="form-input" name="codepostal" placeholder="Postal Code" required>
+                <input type="text" class="form-input" name="ville" placeholder="City">
+                <button type="submit" class="cta-submit">Establish Connection</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logo">ELECTRIC NIGHT</div>
+        <p>© 2025 ELECTRIC NIGHT // The Future is Electric</p>
+    </footer>
+
+    <script>
+        const WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/25139951/ufknvhd/';
+
+        async function sendToZapier(data, source) {
+            try {
+                const payload = { ...data, source, page: 'index-retro.html', timestamp: new Date().toISOString() };
+                await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                console.log('Data sent:', payload);
+                return true;
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
+        }
+
+        function handleForm(formId, source) {
+            document.getElementById(formId).addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const data = Object.fromEntries(new FormData(this).entries());
+                const btn = this.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = 'TRANSMITTING...';
+                btn.disabled = true;
+                await sendToZapier(data, source);
+                btn.innerHTML = 'SIGNAL RECEIVED';
+                btn.style.background = '#39ff14';
+                setTimeout(() => { this.reset(); btn.innerHTML = originalText; btn.style.background = ''; btn.disabled = false; }, 3000);
+            });
+        }
+
+        handleForm('heroForm', 'hero_form');
+        handleForm('ctaForm', 'main_form');
+
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+

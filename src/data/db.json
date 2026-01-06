@@ -1,0 +1,601 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Michael Alves",
+      "email": "admin@newsletterpro.com",
+      "password": "$2b$10$a6EPMsMeKSsDPJdJqiN0OOHCLC3C1atEU3dy8IdxzgPV0gQfSsDWS",
+      "role": "admin",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "phone": "0610936557",
+      "street": "40 rue du colisée",
+      "apt": "",
+      "city": "Paris",
+      "state": "",
+      "updatedAt": "2025-12-31T20:23:36.358Z"
+    },
+    {
+      "id": 2,
+      "name": "Jean Dupont",
+      "email": "jean@example.com",
+      "password": "$2b$10$cOnLCDWbcZ5onsnDEpUmjOGwwGignSRB0c65/x86wtVYmHTVRpgSK",
+      "role": "user",
+      "createdAt": "2025-12-31T18:35:41.985Z"
+    },
+    {
+      "id": 3,
+      "name": "Martin Comar",
+      "email": "mcomar@welcoming.com",
+      "password": "$2b$10$EZ7npiopzwfO87lNi7DIk.Q6AhVdEF187Y42sc56775vbVAdMROpe",
+      "role": "admin",
+      "createdAt": "2025-12-31T23:59:12.479Z"
+    },
+    {
+      "id": 4,
+      "name": "Test User",
+      "email": "test@example.com",
+      "password": "$2b$10$c0IqewQ8Gl17qWhwe7v6gOAAjejG1bHtZIemCLj6fYE4Zk8R5Wc9S",
+      "role": "user",
+      "createdAt": "2026-01-05T22:05:02.150Z"
+    },
+    {
+      "id": 5,
+      "name": "Admin",
+      "email": "admin@landinghub.com",
+      "password": "$2b$10$l9ZpMcFNYWLzI9ZK60h4BuRfHQM2QRPcAh2KPmdCMGYnbubovAo1m",
+      "role": "admin",
+      "createdAt": "2026-01-06T11:28:49.964Z"
+    },
+    {
+      "id": 6,
+      "name": "Marine",
+      "email": "mbaizeau@welcoming.com",
+      "password": "$2b$10$U5jmYrYMf6aj1O1OVcetJeGrcsQEZoTb6gD0RQC75stk7wFH/s4ZW",
+      "role": "admin",
+      "createdAt": "2026-01-06T12:36:07.901Z"
+    }
+  ],
+  "newsletters": [
+    {
+      "id": 1,
+      "name": "Le Figaro",
+      "description": "Sélection business & politique publique, format synthétique + modules audio. Palette claire et monochrome, hiérarchie en capitales et blocs parfaitement alignés.",
+      "subscribers": 2400,
+      "openRate": 24.8,
+      "status": "active",
+      "createdBy": 1,
+      "createdAt": "2024-01-15T08:00:00.000Z",
+      "updatedAt": "2024-01-15T08:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "20 Minutes",
+      "description": "Actualités quotidiennes",
+      "subscribers": 1800,
+      "openRate": 31.2,
+      "status": "active",
+      "createdBy": 1,
+      "createdAt": "2024-01-15T08:00:00.000Z",
+      "updatedAt": "2024-01-15T08:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "name": "Ouest France",
+      "description": "Radio & web",
+      "subscribers": 956,
+      "openRate": 19.4,
+      "status": "active",
+      "createdBy": 1,
+      "createdAt": "2024-01-15T08:00:00.000Z",
+      "updatedAt": "2024-01-15T08:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "name": "Super NL",
+      "description": "C'est une newsletter test pour impressionner Martin.",
+      "status": "active",
+      "createdBy": 1,
+      "subscribers": "0",
+      "openRate": "0",
+      "createdAt": "2025-12-31T20:08:23.232Z",
+      "updatedAt": "2026-01-01T00:03:01.459Z"
+    }
+  ],
+  "subscribers": [
+    {
+      "id": 1,
+      "email": "user@example.com",
+      "name": "User Example",
+      "subscribedNewsletters": [
+        1,
+        2
+      ],
+      "status": "active",
+      "createdAt": "2024-01-10T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "email": "contact@test.com",
+      "name": "Contact Test",
+      "subscribedNewsletters": [
+        1
+      ],
+      "status": "active",
+      "createdAt": "2024-01-12T00:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "name": "Martin Comar",
+      "email": "mcomar@gmail.com",
+      "newsletters": [
+        "1",
+        "2"
+      ],
+      "subscribedNewsletters": [
+        1,
+        2
+      ],
+      "status": "active",
+      "createdAt": "2026-01-01T00:03:39.320Z"
+    },
+    {
+      "id": 5,
+      "name": "Toto",
+      "email": "toto@gmail.com",
+      "newsletters": [
+        "1",
+        "2"
+      ],
+      "subscribedNewsletters": [
+        1,
+        2
+      ],
+      "status": "active",
+      "createdAt": "2026-01-02T09:05:49.005Z"
+    }
+  ],
+  "activities": [
+    {
+      "id": 1,
+      "type": "email_sent",
+      "userId": 1,
+      "newsletterId": 1,
+      "details": "2400 emails envoyés",
+      "timestamp": "2024-01-15T08:30:00.000Z"
+    },
+    {
+      "id": 2,
+      "type": "newsletter_created",
+      "userId": 1,
+      "newsletterId": 2,
+      "details": "Newsletter '20 Minutes' créée",
+      "timestamp": "2024-01-15T09:00:00.000Z"
+    }
+  ],
+  "invoices": [
+    {
+      "id": 1,
+      "invoiceNumber": "INV-2024-001",
+      "userId": 1,
+      "amount": 149,
+      "currency": "EUR",
+      "status": "paid",
+      "description": "Abonnement Pro - Janvier 2024",
+      "items": [
+        {
+          "name": "Plan Pro",
+          "quantity": 1,
+          "unitPrice": 99,
+          "total": 99
+        },
+        {
+          "name": "Emails envoyés (5 000)",
+          "quantity": 5000,
+          "unitPrice": 0.01,
+          "total": 50
+        }
+      ],
+      "subtotal": 149,
+      "tax": 29.8,
+      "total": 178.8,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "dueDate": "2024-01-15T00:00:00.000Z",
+      "paidAt": "2024-01-05T10:30:00.000Z"
+    },
+    {
+      "id": 2,
+      "invoiceNumber": "INV-2024-002",
+      "userId": 1,
+      "amount": 199,
+      "currency": "EUR",
+      "status": "paid",
+      "description": "Abonnement Pro - Février 2024",
+      "items": [
+        {
+          "name": "Plan Pro",
+          "quantity": 1,
+          "unitPrice": 99,
+          "total": 99
+        },
+        {
+          "name": "Emails envoyés (10 000)",
+          "quantity": 10000,
+          "unitPrice": 0.01,
+          "total": 100
+        }
+      ],
+      "subtotal": 199,
+      "tax": 39.8,
+      "total": 238.8,
+      "createdAt": "2024-02-01T00:00:00.000Z",
+      "dueDate": "2024-02-15T00:00:00.000Z",
+      "paidAt": "2024-02-03T14:20:00.000Z"
+    },
+    {
+      "id": 3,
+      "invoiceNumber": "INV-2024-003",
+      "userId": 1,
+      "amount": 249,
+      "currency": "EUR",
+      "status": "pending",
+      "description": "Abonnement Pro - Mars 2024",
+      "items": [
+        {
+          "name": "Plan Pro",
+          "quantity": 1,
+          "unitPrice": 99,
+          "total": 99
+        },
+        {
+          "name": "Emails envoyés (15 000)",
+          "quantity": 15000,
+          "unitPrice": 0.01,
+          "total": 150
+        }
+      ],
+      "subtotal": 249,
+      "tax": 49.8,
+      "total": 298.8,
+      "createdAt": "2024-03-01T00:00:00.000Z",
+      "dueDate": "2024-03-15T00:00:00.000Z",
+      "paidAt": null
+    },
+    {
+      "id": 4,
+      "invoiceNumber": "INV-2025-001",
+      "userId": 1,
+      "amount": 149,
+      "currency": "EUR",
+      "status": "overdue",
+      "description": "Abonnement Pro - Décembre 2025",
+      "items": [
+        {
+          "name": "Plan Pro",
+          "quantity": 1,
+          "unitPrice": 99,
+          "total": 99
+        },
+        {
+          "name": "Emails envoyés (5 000)",
+          "quantity": 5000,
+          "unitPrice": 0.01,
+          "total": 50
+        }
+      ],
+      "subtotal": 149,
+      "tax": 29.8,
+      "total": 178.8,
+      "createdAt": "2025-12-01T00:00:00.000Z",
+      "dueDate": "2025-12-15T00:00:00.000Z",
+      "paidAt": null
+    },
+    {
+      "id": 5,
+      "invoiceNumber": "INV-2026-001",
+      "userId": 1,
+      "amount": 299,
+      "currency": "EUR",
+      "status": "upcoming",
+      "description": "Abonnement Pro - Janvier 2026",
+      "items": [
+        {
+          "name": "Plan Pro",
+          "quantity": 1,
+          "unitPrice": 99,
+          "total": 99
+        },
+        {
+          "name": "Emails envoyés (20 000)",
+          "quantity": 20000,
+          "unitPrice": 0.01,
+          "total": 200
+        }
+      ],
+      "subtotal": 299,
+      "tax": 59.8,
+      "total": 358.8,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "dueDate": "2026-01-15T00:00:00.000Z",
+      "paidAt": null
+    }
+  ],
+  "templates": [
+    {
+      "id": 1,
+      "name": "Template 1",
+      "description": "Description du template",
+      "userId": 1,
+      "filePath": "template-1/config.json",
+      "thumbnail": "/templates/template-1/thumbnail.png",
+      "createdAt": "2026-01-03T02:40:18.263Z",
+      "updatedAt": "2026-01-04T15:17:49.178Z"
+    },
+    {
+      "id": 2,
+      "name": "Template 2",
+      "description": "C'est la description",
+      "userId": 1,
+      "filePath": "template-2/config.json",
+      "thumbnail": "/templates/template-2/thumbnail.png",
+      "createdAt": "2026-01-03T02:57:56.135Z",
+      "updatedAt": "2026-01-03T02:57:56.136Z"
+    },
+    {
+      "id": 3,
+      "name": "Nouveau template",
+      "description": "Avec sa description",
+      "userId": 1,
+      "filePath": "template-3/config.json",
+      "thumbnail": "/templates/template-3/thumbnail.png",
+      "createdAt": "2026-01-05T09:31:43.000Z",
+      "updatedAt": "2026-01-05T09:31:43.001Z"
+    },
+    {
+      "id": 4,
+      "name": "Martin",
+      "description": "",
+      "userId": 1,
+      "filePath": "template-4/config.json",
+      "thumbnail": "/templates/template-4/thumbnail.png",
+      "createdAt": "2026-01-05T11:07:39.724Z",
+      "updatedAt": "2026-01-05T11:09:49.236Z"
+    }
+  ],
+  "landingpages": [
+    {
+      "id": 1,
+      "name": "Promo été 2025",
+      "description": "Description de ma landing",
+      "slug": "promo-ete-2026",
+      "status": "draft",
+      "createdBy": 1,
+      "visitors": 68,
+      "conversionRate": 7.35,
+      "createdAt": "2026-01-05T12:20:22.561Z",
+      "updatedAt": "2026-01-06T09:30:18.079Z",
+      "attachedTemplates": [
+        {
+          "libraryId": 1,
+          "fileName": "tesla-lead.html",
+          "attachedAt": "2026-01-06T09:27:12.277Z"
+        }
+      ],
+      "mainHtmlFile": {
+        "libraryId": 1,
+        "fileName": "tesla-lead.html",
+        "filePath": "/",
+        "setAt": "2026-01-06T09:28:17.535Z"
+      },
+      "dailyStats": {
+        "2026-01-06": {
+          "visitors": 9
+        }
+      }
+    }
+  ],
+  "leads": [
+    {
+      "id": 1,
+      "email": "malves@welcoming-group.com",
+      "phone": "0610936557",
+      "landingPages": [
+        "1"
+      ],
+      "status": "qualified",
+      "sourceLandingPages": [
+        1
+      ],
+      "createdAt": "2026-01-05T12:21:06.351Z",
+      "firstName": "Michael",
+      "lastName": "ALVES",
+      "address": "42 rue de la république",
+      "postalCode": "92000",
+      "city": "Nanterre",
+      "updatedAt": "2026-01-05T22:30:44.650Z"
+    },
+    {
+      "id": 2,
+      "email": "test@test.com",
+      "phone": "0606060606",
+      "status": "new",
+      "sourceLandingPages": [
+        1
+      ],
+      "customFields": {
+        "codepostal": "92500",
+        "ville": "Rueil"
+      },
+      "createdAt": "2026-01-05T16:29:27.216Z",
+      "firstName": "TEst",
+      "lastName": ""
+    },
+    {
+      "id": 4,
+      "firstName": "Brigite",
+      "lastName": "Macron",
+      "email": "bm@gmail.com",
+      "phone": "0610936557",
+      "address": "",
+      "postalCode": "92500",
+      "city": "Rueil",
+      "status": "new",
+      "sourceLandingPages": [
+        1
+      ],
+      "customFields": {},
+      "createdAt": "2026-01-06T01:11:54.176Z"
+    },
+    {
+      "id": 5,
+      "firstName": "Sandra",
+      "lastName": "Sandra",
+      "email": "s@gmail.com",
+      "phone": "0650505050",
+      "address": "",
+      "postalCode": "92000",
+      "city": "",
+      "status": "new",
+      "sourceLandingPages": [
+        1
+      ],
+      "customFields": {},
+      "createdAt": "2026-01-06T01:17:19.976Z"
+    },
+    {
+      "id": 6,
+      "firstName": "Mathilde",
+      "lastName": "C",
+      "email": "mc@gmail.com",
+      "phone": "0606060606",
+      "address": "",
+      "postalCode": "92210",
+      "city": "ST CLOUD",
+      "status": "new",
+      "sourceLandingPages": [
+        1
+      ],
+      "customFields": {},
+      "createdAt": "2026-01-06T09:30:18.078Z"
+    }
+  ],
+  "libraries": [
+    {
+      "id": 1,
+      "name": "Template 1",
+      "description": "C'est la description du template\r\n",
+      "userId": 1,
+      "files": [
+        {
+          "id": 1767623611935.216,
+          "name": "imgi_1321_V4Supercharger_80.jpeg",
+          "type": "jpeg",
+          "size": "267.64 KB",
+          "path": "/Blabla",
+          "uploadedAt": "2026-01-05T14:26:07.730Z"
+        },
+        {
+          "id": 1767623611936.99,
+          "name": "Group_49.jpg",
+          "type": "jpg",
+          "size": "183.10 KB",
+          "path": "/",
+          "uploadedAt": "2026-01-05T14:22:05.882Z"
+        },
+        {
+          "id": 1767623611936.8933,
+          "name": "ModelYStandard_72.jpg",
+          "type": "jpg",
+          "size": "327.13 KB",
+          "path": "/",
+          "uploadedAt": "2026-01-05T14:22:39.990Z"
+        },
+        {
+          "id": 1767623611936.3462,
+          "name": "imgi_1321_V4Supercharger_80.jpeg",
+          "type": "jpeg",
+          "size": "267.64 KB",
+          "path": "/",
+          "uploadedAt": "2026-01-05T14:22:29.062Z"
+        },
+        {
+          "id": 1767623611936.9363,
+          "name": "imgi_1433_DestinationCharging_93.jpeg",
+          "type": "jpeg",
+          "size": "214.80 KB",
+          "path": "/",
+          "uploadedAt": "2026-01-05T14:22:50.418Z"
+        }
+      ],
+      "createdAt": "2026-01-05T12:34:55.779Z",
+      "updatedAt": "2026-01-05T14:26:07.735Z",
+      "folders": [
+        {
+          "id": 1767619584253,
+          "name": "images",
+          "path": "/",
+          "createdAt": "2026-01-05T13:26:24.253Z"
+        },
+        {
+          "id": 1767621324248,
+          "name": "test2",
+          "path": "/",
+          "createdAt": "2026-01-05T13:55:24.248Z"
+        },
+        {
+          "id": 1767621385799,
+          "name": "test3",
+          "path": "/",
+          "createdAt": "2026-01-05T13:56:25.799Z"
+        },
+        {
+          "id": 1767621457528,
+          "name": "test4",
+          "path": "/",
+          "createdAt": "2026-01-05T13:57:37.528Z"
+        },
+        {
+          "id": 1767621476288,
+          "name": "test5",
+          "path": "/",
+          "createdAt": "2026-01-05T13:57:56.288Z"
+        },
+        {
+          "id": 1767621578008,
+          "name": "test7",
+          "path": "/",
+          "createdAt": "2026-01-05T13:59:38.008Z"
+        },
+        {
+          "id": 1767621724538,
+          "name": "test22",
+          "path": "/",
+          "createdAt": "2026-01-05T14:02:04.538Z"
+        },
+        {
+          "id": 1767621795129,
+          "name": "test99",
+          "path": "/",
+          "createdAt": "2026-01-05T14:03:15.129Z"
+        },
+        {
+          "id": 1767621808469,
+          "name": "Blabla",
+          "path": "/",
+          "createdAt": "2026-01-05T14:03:28.469Z"
+        },
+        {
+          "id": 1767622187457,
+          "name": "lemonde",
+          "path": "/",
+          "createdAt": "2026-01-05T14:09:47.457Z"
+        },
+        {
+          "id": 1767622339423,
+          "name": "blabla",
+          "path": "/",
+          "createdAt": "2026-01-05T14:12:19.423Z"
+        }
+      ]
+    }
+  ]
+}

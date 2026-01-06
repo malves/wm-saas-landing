@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>静 SHIZUKA — L'Art de la Mobilité Silencieuse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1a1a;
+            --charcoal: #2d2d2d;
+            --stone: #4a4a4a;
+            --mist: #a8a8a8;
+            --paper: #f5f3ef;
+            --cream: #faf8f5;
+            --red: #b8242a;
+            --gold: #c4a35a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Cormorant', sans-serif;
+            background: var(--cream);
+            color: var(--ink);
+            overflow-x: hidden;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        /* Washi paper texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        /* Enso circle decoration */
+        .enso {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 3px solid var(--mist);
+            border-radius: 50%;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(250, 248, 245, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-kanji {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--red);
+        }
+
+        .logo-text {
+            font-family: 'Cormorant', serif;
+            font-size: 1.4rem;
+            font-weight: 500;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .header-btn {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: transparent;
+            border: 1px solid var(--ink);
+            color: var(--ink);
+            padding: 0.9rem 2.5rem;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-decoration: none;
+            transition: all 0.4s ease;
+        }
+
+        .header-btn:hover {
+            background: var(--ink);
+            color: var(--cream);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 140px 8% 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero .enso {
+            top: 15%;
+            right: 10%;
+        }
+
+        .hero .enso:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            bottom: 20%;
+            left: 5%;
+            top: auto;
+            right: auto;
+        }
+
+        .vertical-text {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1rem;
+            letter-spacing: 8px;
+            color: var(--mist);
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8rem;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero-text h1 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+        }
+
+        .hero-text h1 .jp {
+            display: block;
+            font-size: 0.5em;
+            color: var(--mist);
+            margin-bottom: 0.5rem;
+            letter-spacing: 4px;
+        }
+
+        .hero-subtitle {
+            font-family: 'Cormorant', serif;
+            font-size: 1.2rem;
+            font-style: italic;
+            line-height: 2;
+            color: var(--stone);
+            margin-bottom: 3rem;
+            max-width: 400px;
+        }
+
+        .philosophy {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .philosophy-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .philosophy-number {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 0.9rem;
+            color: var(--red);
+            min-width: 30px;
+        }
+
+        .philosophy-text {
+            font-size: 0.95rem;
+            color: var(--stone);
+        }
+
+        .philosophy-text strong {
+            color: var(--ink);
+            font-weight: 500;
+        }
+
+        /* Hero Form */
+        .hero-form {
+            background: var(--paper);
+            padding: 3.5rem;
+            position: relative;
+        }
+
+        .hero-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 60px;
+            background: var(--red);
+        }
+
+        .form-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .form-header h3 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            font-family: 'Cormorant', serif;
+            font-style: italic;
+            color: var(--stone);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--mist);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--mist);
+            color: var(--ink);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: var(--mist);
+        }
+
+        .form-input:focus {
+            border-color: var(--ink);
+        }
+
+        .form-submit {
+            width: 100%;
+            background: var(--ink);
+            border: none;
+            color: var(--cream);
+            padding: 1.2rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            margin-top: 1rem;
+        }
+
+        .form-submit:hover {
+            background: var(--charcoal);
+        }
+
+        .form-note {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--mist);
+            letter-spacing: 1px;
+        }
+
+        /* Philosophy Section */
+        .philosophy-section {
+            padding: 120px 8%;
+            background: var(--ink);
+            color: var(--paper);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .philosophy-section .enso {
+            border-color: rgba(255, 255, 255, 0.1);
+            width: 500px;
+            height: 500px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .philosophy-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .philosophy-quote {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 400;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .philosophy-quote::before,
+        .philosophy-quote::after {
+            content: '「';
+            color: var(--gold);
+        }
+
+        .philosophy-quote::after {
+            content: '」';
+        }
+
+        .philosophy-author {
+            font-size: 0.9rem;
+            color: var(--mist);
+            letter-spacing: 3px;
+        }
+
+        /* Features */
+        .features {
+            padding: 120px 8%;
+            background: var(--cream);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 .kanji {
+            display: block;
+            font-size: 0.6em;
+            color: var(--mist);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            font-family: 'Cormorant', serif;
+            font-style: italic;
+            color: var(--stone);
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            max-width: 1100px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card {
+            background: var(--cream);
+            padding: 3rem 2.5rem;
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        .feature-card:hover {
+            background: var(--paper);
+        }
+
+        .feature-kanji {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 2.5rem;
+            color: var(--red);
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .feature-card h3 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: var(--stone);
+            line-height: 1.9;
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 120px 8%;
+            background: var(--paper);
+        }
+
+        .cta-container {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .cta-container h2 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .cta-container > p {
+            font-family: 'Cormorant', serif;
+            font-style: italic;
+            color: var(--stone);
+            margin-bottom: 3rem;
+        }
+
+        .cta-form {
+            background: var(--cream);
+            padding: 3rem;
+            text-align: left;
+        }
+
+        .cta-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .cta-form-grid .full {
+            grid-column: span 2;
+        }
+
+        .cta-submit {
+            grid-column: span 2;
+            width: 100%;
+            background: var(--ink);
+            border: none;
+            color: var(--cream);
+            padding: 1.2rem;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            margin-top: 1rem;
+        }
+
+        .cta-submit:hover {
+            background: var(--charcoal);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 8%;
+            background: var(--ink);
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-logo .logo-kanji {
+            color: var(--gold);
+        }
+
+        .footer-logo .logo-text {
+            color: var(--paper);
+        }
+
+        footer p {
+            font-size: 0.8rem;
+            color: var(--mist);
+            letter-spacing: 1px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+                text-align: center;
+            }
+
+            .hero-form {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .philosophy {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .hero-subtitle {
+                margin: 0 auto 3rem;
+            }
+
+            .vertical-text {
+                display: none;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+
+            .cta-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-form-grid .full,
+            .cta-submit {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1.5rem 5%;
+            }
+
+            .hero {
+                padding: 120px 5% 80px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .logo-text {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span class="logo-kanji">静</span>
+            <span class="logo-text">Shizuka</span>
+        </div>
+        <a href="#contact" class="header-btn">お問い合わせ</a>
+    </header>
+
+    <section class="hero">
+        <div class="enso"></div>
+        <div class="enso"></div>
+        <div class="vertical-text">静かな革命 — La révolution silencieuse</div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>
+                    <span class="jp">電気自動車の美学</span>
+                    Le silence comme luxe suprême
+                </h1>
+                <p class="hero-subtitle">Dans un monde de bruit et de fureur, redécouvrez la sérénité d'une conduite pure. L'électrique n'est pas une technologie, c'est une philosophie.</p>
+                
+                <div class="philosophy">
+                    <div class="philosophy-item">
+                        <span class="philosophy-number">一</span>
+                        <span class="philosophy-text"><strong>Ma 間</strong> — L'espace entre. 650 km d'autonomie pour voyager sans contrainte.</span>
+                    </div>
+                    <div class="philosophy-item">
+                        <span class="philosophy-number">二</span>
+                        <span class="philosophy-text"><strong>Shizen 自然</strong> — Naturel. Zéro émission, en harmonie avec l'environnement.</span>
+                    </div>
+                    <div class="philosophy-item">
+                        <span class="philosophy-number">三</span>
+                        <span class="philosophy-text"><strong>Kanso 簡素</strong> — Simplicité. Une expérience épurée, essentielle.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-form">
+                <div class="form-header">
+                    <h3>体験予約</h3>
+                    <p>Réservez votre expérience de conduite</p>
+                </div>
+                <form id="heroForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Prénom</label>
+                            <input type="text" class="form-input" name="prenom" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nom</label>
+                            <input type="text" class="form-input" name="nom" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-input" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="tel" class="form-input" name="telephone" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Adresse</label>
+                            <input type="text" class="form-input" name="adresse">
+                        </div>
+                        <div class="form-group">
+                            <label>Code Postal</label>
+                            <input type="text" class="form-input" name="codepostal" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="form-submit">予約する — Réserver</button>
+                    <p class="form-note">Vos informations restent confidentielles</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="philosophy-section">
+        <div class="enso"></div>
+        <div class="philosophy-content">
+            <p class="philosophy-quote">
+                Le silence n'est pas l'absence de son, c'est la présence de la paix
+            </p>
+            <p class="philosophy-author">— PHILOSOPHIE SHIZUKA</p>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="section-header">
+            <h2>
+                <span class="kanji">特徴</span>
+                Les six vertus
+            </h2>
+            <p>Chaque aspect pensé pour l'harmonie</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-kanji">静</div>
+                <h3>Silence</h3>
+                <p>Un habitacle d'une sérénité absolue. Voyagez dans un sanctuaire de calme.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-kanji">力</div>
+                <h3>Puissance</h3>
+                <p>Couple instantané, accélération fluide. La force sans la brutalité.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-kanji">道</div>
+                <h3>Autonomie</h3>
+                <p>650+ km de liberté. Le chemin s'ouvre devant vous, sans limite.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-kanji">和</div>
+                <h3>Harmonie</h3>
+                <p>Zéro émission. Roulez en paix avec la nature et votre conscience.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-kanji">守</div>
+                <h3>Protection</h3>
+                <p>Sécurité 5 étoiles. Technologies de pointe pour protéger ce qui compte.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-kanji">節</div>
+                <h3>Économie</h3>
+                <p>2 000€ d'économies annuelles. La sagesse dans chaque trajet.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section" id="contact">
+        <div class="cta-container">
+            <h2>お問い合わせ</h2>
+            <p>Commencez votre voyage vers la sérénité</p>
+            <form class="cta-form" id="ctaForm">
+                <div class="cta-form-grid">
+                    <div class="form-group">
+                        <label>Prénom</label>
+                        <input type="text" class="form-input" name="prenom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <input type="text" class="form-input" name="nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="tel" class="form-input" name="telephone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-input" name="email" required>
+                    </div>
+                    <div class="form-group full">
+                        <label>Adresse</label>
+                        <input type="text" class="form-input" name="adresse">
+                    </div>
+                    <div class="form-group">
+                        <label>Code Postal</label>
+                        <input type="text" class="form-input" name="codepostal" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ville</label>
+                        <input type="text" class="form-input" name="ville">
+                    </div>
+                    <button type="submit" class="cta-submit">送信する — Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logo">
+            <span class="logo-kanji">静</span>
+            <span class="logo-text">Shizuka</span>
+        </div>
+        <p>© 2025 Shizuka — 静かな革命</p>
+    </footer>
+
+    <script>
+        const WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/25139951/ufknvhd/';
+
+        async function sendToZapier(data, source) {
+            try {
+                const payload = { ...data, source, page: 'index-zen.html', timestamp: new Date().toISOString() };
+                await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                console.log('Data sent:', payload);
+                return true;
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
+        }
+
+        function handleForm(formId, source) {
+            document.getElementById(formId).addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const data = Object.fromEntries(new FormData(this).entries());
+                const btn = this.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '送信中...';
+                btn.disabled = true;
+                await sendToZapier(data, source);
+                btn.innerHTML = '✓ 送信完了';
+                btn.style.background = '#2e7d32';
+                setTimeout(() => { this.reset(); btn.innerHTML = originalText; btn.style.background = ''; btn.disabled = false; }, 3000);
+            });
+        }
+
+        handleForm('heroForm', 'hero_form');
+        handleForm('ctaForm', 'main_form');
+
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+

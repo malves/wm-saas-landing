@@ -1,0 +1,277 @@
+<%
+  const formatNumber = (value) => {
+    const num = Number(value);
+    if (Number.isNaN(num)) return value || 0;
+    return num.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+  
+  const formatDate = (dateString) => {
+    if (!dateString) return '—';
+    return new Date(dateString).toLocaleDateString('fr-FR', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    });
+  };
+  
+  const getStatusConfig = (status) => {
+    const configs = {
+      paid: { label: 'Payée', class: 'bg-success/10 text-success border-success/20' },
+      pending: { label: 'En cours', class: 'bg-warning/10 text-warning border-warning/20' },
+      overdue: { label: 'En retard', class: 'bg-danger/10 text-danger border-danger/20' },
+      upcoming: { label: 'À venir', class: 'bg-muted/10 text-muted border-muted/20' }
+    };
+    return configs[status] || { label: status, class: 'bg-muted/10 text-muted border-muted/20' };
+  };
+  
+  // Trier les factures par date (plus récentes en premier)
+  const sortedInvoices = invoices.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+%>
+
+<!-- Header -->
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-3xl md:text-4xl font-bold">Facturation</h1>
+    <p class="text-muted text-sm mt-2 max-w-2xl">
+      Gérez vos factures, suivez vos paiements et consultez l'historique de vos transactions.
+    </p>
+  </div>
+  <div class="flex flex-wrap items-center gap-3">
+    <button class="px-4 py-2 rounded-xl border border-border text-primary font-semibold hover:-translate-y-0.5 transition text-sm shadow-sm">
+      Télécharger tout (PDF)
+    </button>
+    <button class="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition text-sm">
+      Paramètres de paiement
+    </button>
+  </div>
+</div>
+
+<div class="space-y-8">
+  <!-- Filters -->
+  <section class="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.3em]">
+    <button class="filter-btn px-3 py-1.5 rounded-full bg-primary text-white whitespace-nowrap flex-shrink-0" data-filter="all">Toutes</button>
+    <button class="filter-btn px-3 py-1.5 rounded-full border border-border text-muted hover:text-primary transition whitespace-nowrap flex-shrink-0" data-filter="paid">Payées</button>
+    <button class="filter-btn px-3 py-1.5 rounded-full border border-border text-muted hover:text-primary transition whitespace-nowrap flex-shrink-0" data-filter="pending">En cours</button>
+    <button class="filter-btn px-3 py-1.5 rounded-full border border-border text-muted hover:text-primary transition whitespace-nowrap flex-shrink-0" data-filter="overdue">En retard</button>
+  </section>
+
+  <!-- Invoices Table -->
+  <section class="bg-card border border-border rounded-[32px] p-6 md:p-8 space-y-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <p class="text-xs uppercase tracking-[0.4em] text-muted">Historique</p>
+        <h3 class="text-2xl font-semibold">Liste des factures</h3>
+      </div>
+    </div>
+    
+    <% if (sortedInvoices.length === 0) { %>
+      <div class="text-center py-12">
+        <svg class="w-16 h-16 mx-auto text-muted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/>
+        </svg>
+        <p class="text-muted text-lg">Aucune facture pour le moment</p>
+      </div>
+    <% } else { %>
+      <div class="overflow-x-auto rounded-3xl border border-border">
+        <table id="invoices-table" class="min-w-full text-sm">
+          <thead class="bg-background text-muted uppercase text-xs tracking-[0.35em]">
+            <tr>
+              <th class="px-6 py-4 text-left">Facture</th>
+              <th class="px-6 py-4 text-left">Date</th>
+              <th class="px-6 py-4 text-left">Statut</th>
+              <th class="px-6 py-4 text-right">Montant HT</th>
+              <th class="px-6 py-4 text-right">TVA</th>
+              <th class="px-6 py-4 text-right">Total TTC</th>
+              <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border">
+            <% sortedInvoices.forEach(invoice => { 
+              const statusConfig = getStatusConfig(invoice.status);
+            %>
+              <tr class="hover:bg-background/50 transition">
+                <td class="px-6 py-5">
+                  <p class="font-semibold"><%= invoice.invoiceNumber %></p>
+                  <p class="text-muted text-xs"><%= invoice.description %></p>
+                </td>
+                <td class="px-6 py-5 text-muted">
+                  <p><%= formatDate(invoice.createdAt) %></p>
+                  <% if (invoice.dueDate) { %>
+                    <p class="text-xs">Échéance : <%= formatDate(invoice.dueDate) %></p>
+                  <% } %>
+                </td>
+                <td class="px-6 py-5">
+                  <span class="px-3 py-1.5 rounded-full border text-xs uppercase tracking-[0.3em] font-semibold whitespace-nowrap <%= statusConfig.class %>">
+                    <%= statusConfig.label %>
+                  </span>
+                </td>
+                <td class="px-6 py-5 text-right font-medium">
+                  <span class="whitespace-nowrap"><%= formatNumber(invoice.subtotal) %> €</span>
+                </td>
+                <td class="px-6 py-5 text-right text-muted">
+                  <span class="whitespace-nowrap"><%= formatNumber(invoice.tax) %> €</span>
+                </td>
+                <td class="px-6 py-5 text-right">
+                  <p class="text-lg font-semibold text-primary whitespace-nowrap"><%= formatNumber(invoice.total) %> €</p>
+                </td>
+                <td class="px-6 py-5 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <a href="/billing/<%= invoice.id %>" class="text-primary font-semibold underline-offset-4 hover:underline text-xs uppercase tracking-[0.3em]">
+                      Détails
+                    </a>
+                    <a href="/billing/<%= invoice.id %>/download" class="text-muted hover:text-primary transition" title="Télécharger PDF">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                      </svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- Recent Activity -->
+  <section class="grid gap-6 lg:grid-cols-2">
+    <div class="bg-card border border-border rounded-[28px] p-6 md:p-8 space-y-6">
+      <div>
+        <p class="text-xs uppercase tracking-[0.4em] text-muted">Paiements récents</p>
+        <h3 class="text-xl font-semibold">Dernières transactions</h3>
+      </div>
+      <div class="space-y-4">
+        <% const paidInvoices = sortedInvoices.filter(i => i.status === 'paid').slice(0, 3); %>
+        <% if (paidInvoices.length === 0) { %>
+          <p class="text-muted text-sm">Aucune transaction récente</p>
+        <% } else { %>
+          <% paidInvoices.forEach((invoice, index) => { %>
+            <div class="flex items-center justify-between <%= index < paidInvoices.length - 1 ? 'border-b border-border pb-4' : '' %>">
+              <div>
+                <p class="font-semibold"><%= invoice.invoiceNumber %></p>
+                <p class="text-muted text-xs"><%= formatDate(invoice.paidAt) %></p>
+              </div>
+              <div class="text-right">
+                <p class="font-semibold text-success whitespace-nowrap">+ <%= formatNumber(invoice.total) %> €</p>
+                <p class="text-muted text-xs">Payée</p>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+    
+    <div class="bg-card border border-border rounded-[28px] p-6 md:p-8 space-y-6">
+      <div>
+        <p class="text-xs uppercase tracking-[0.4em] text-muted">À payer</p>
+        <h3 class="text-xl font-semibold">Prochaines échéances</h3>
+      </div>
+      <div class="space-y-4">
+        <% const unpaidInvoices = sortedInvoices.filter(i => i.status !== 'paid').slice(0, 3); %>
+        <% if (unpaidInvoices.length === 0) { %>
+          <p class="text-muted text-sm">Aucune facture en attente</p>
+        <% } else { %>
+          <% unpaidInvoices.forEach((invoice, index) => { 
+            const statusConfig = getStatusConfig(invoice.status);
+          %>
+            <div class="flex items-center justify-between <%= index < unpaidInvoices.length - 1 ? 'border-b border-border pb-4' : '' %>">
+              <div>
+                <p class="font-semibold"><%= invoice.invoiceNumber %></p>
+                <p class="text-muted text-xs">Échéance : <%= formatDate(invoice.dueDate) %></p>
+              </div>
+              <div class="text-right">
+                <p class="font-semibold <%= invoice.status === 'overdue' ? 'text-danger' : 'text-primary' %> whitespace-nowrap"><%= formatNumber(invoice.total) %> €</p>
+                <span class="text-xs uppercase tracking-[0.3em] whitespace-nowrap <%= statusConfig.class.includes('danger') ? 'text-danger' : 'text-muted' %>">
+                  <%= statusConfig.label %>
+                </span>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Payment Method -->
+  <section class="bg-card border border-border rounded-[28px] p-6 md:p-8 space-y-6">
+    <div>
+      <p class="text-xs uppercase tracking-[0.4em] text-muted">Moyen de paiement</p>
+      <h3 class="text-2xl font-semibold">Carte enregistrée</h3>
+    </div>
+    <div class="flex items-center justify-between bg-background border border-border rounded-2xl p-6">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v2h16V6H4zm0 4v8h16v-8H4z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-semibold">Visa •••• 4242</p>
+          <p class="text-muted text-sm">Expire 12/2026</p>
+        </div>
+      </div>
+      <button class="px-4 py-2 rounded-xl border border-border text-primary font-semibold hover:-translate-y-0.5 transition text-sm">
+        Modifier
+      </button>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const tableRows = document.querySelectorAll('#invoices-table tbody tr');
+
+      // Fonction pour filtrer les factures
+      function filterInvoices(filterType) {
+        tableRows.forEach(row => {
+          const statusBadge = row.querySelector('td:nth-child(4) span');
+          if (!statusBadge) return;
+
+          const statusText = statusBadge.textContent.trim().toLowerCase();
+          let shouldShow = false;
+
+          switch(filterType) {
+            case 'all':
+              shouldShow = true;
+              break;
+            case 'paid':
+              shouldShow = statusText === 'payée';
+              break;
+            case 'pending':
+              shouldShow = statusText === 'en cours';
+              break;
+            case 'overdue':
+              shouldShow = statusText === 'en retard';
+              break;
+          }
+
+          row.style.display = shouldShow ? '' : 'none';
+        });
+      }
+
+      // Gestionnaire d'événement pour les boutons de filtre
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Retirer la classe active de tous les boutons
+          filterButtons.forEach(btn => {
+            btn.classList.remove('bg-primary', 'text-white');
+            btn.classList.add('border', 'border-border', 'text-muted', 'hover:text-primary');
+          });
+
+          // Ajouter la classe active au bouton cliqué
+          this.classList.remove('border', 'border-border', 'text-muted', 'hover:text-primary');
+          this.classList.add('bg-primary', 'text-white');
+
+          // Appliquer le filtre
+          const filterType = this.getAttribute('data-filter');
+          filterInvoices(filterType);
+        });
+      });
+
+      // Afficher toutes les factures par défaut
+      filterInvoices('all');
+    });
+  </script>
+</div>
+

@@ -1,0 +1,113 @@
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <p class="text-sm text-muted">Leads</p>
+    <h1 class="text-3xl font-bold">Liste des leads</h1>
+    <p class="text-muted text-sm mt-2">Gérez vos contacts collectés via vos landing pages.</p>
+  </div>
+  <div class="flex flex-wrap items-center gap-3">
+    <button class="px-4 py-2 rounded-xl border border-border text-muted hover:text-primary hover:border-primary transition text-sm font-semibold">
+      Exporter CSV
+    </button>
+    <a href="/leads/create" class="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition">
+      Ajouter un lead
+    </a>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-card rounded-2xl p-6 border border-border">
+    <p class="text-xs uppercase tracking-widest text-muted mb-2">Total</p>
+    <p class="text-3xl font-bold"><%= stats.total %></p>
+    <p class="text-sm text-muted mt-1">leads</p>
+  </div>
+  <div class="bg-card rounded-2xl p-6 border border-border">
+    <p class="text-xs uppercase tracking-widest text-muted mb-2">Nouveaux</p>
+    <p class="text-3xl font-bold text-blue-500"><%= stats.new %></p>
+    <p class="text-sm text-muted mt-1">à traiter</p>
+  </div>
+  <div class="bg-card rounded-2xl p-6 border border-border">
+    <p class="text-xs uppercase tracking-widest text-muted mb-2">Qualifiés</p>
+    <p class="text-3xl font-bold text-warning"><%= stats.qualified %></p>
+    <p class="text-sm text-muted mt-1">en cours</p>
+  </div>
+  <div class="bg-card rounded-2xl p-6 border border-border">
+    <p class="text-xs uppercase tracking-widest text-muted mb-2">Convertis</p>
+    <p class="text-3xl font-bold text-success"><%= stats.converted %></p>
+    <p class="text-sm text-muted mt-1">clients</p>
+  </div>
+</div>
+
+<!-- Leads Table -->
+<div class="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="text-muted text-sm border-b border-border bg-background/50">
+          <th class="text-left px-6 py-4 font-medium">ID</th>
+          <th class="text-left px-6 py-4 font-medium">Nom</th>
+          <th class="text-left px-6 py-4 font-medium">Email</th>
+          <th class="text-left px-6 py-4 font-medium">Campagne</th>
+          <th class="text-left px-6 py-4 font-medium">Statut</th>
+          <th class="text-right px-6 py-4 font-medium">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border">
+        <% leads.forEach(lead => { 
+          let statusClass = 'bg-blue-100 text-blue-800';
+          let statusLabel = 'Nouveau';
+          if (lead.status === 'qualified') {
+            statusClass = 'bg-warning/10 text-warning';
+            statusLabel = 'Qualifié';
+          } else if (lead.status === 'converted') {
+            statusClass = 'bg-success/10 text-success';
+            statusLabel = 'Converti';
+          } else if (lead.status === 'lost') {
+            statusClass = 'bg-danger/10 text-danger';
+            statusLabel = 'Perdu';
+          }
+        %>
+          <tr class="hover:bg-background/30 transition cursor-pointer" onclick="window.location.href='/leads/<%= lead.id %>'">
+            <td class="px-6 py-4">
+              <p class="text-sm text-muted">#<%= lead.id %></p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-semibold"><%= lead.fullName %></p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="text-muted"><%= lead.email %></p>
+            </td>
+            <td class="px-6 py-4">
+              <p class="text-sm"><%= lead.campaignName %></p>
+            </td>
+            <td class="px-6 py-4">
+              <span class="px-3 py-1 rounded-full text-xs font-medium <%= statusClass %>">
+                <%= statusLabel %>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right" onclick="event.stopPropagation()">
+              <form method="POST" action="/leads/<%= lead.id %>/delete" onsubmit="return confirm('Supprimer ce lead ?')" class="inline">
+                <button type="submit" class="text-danger hover:underline text-sm font-semibold">
+                  Supprimer
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (leads.length === 0) { %>
+  <div class="text-center py-12 bg-card rounded-2xl border border-border">
+    <svg class="w-16 h-16 text-muted mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+    </svg>
+    <p class="text-muted mb-4">Aucun lead trouvé</p>
+    <a href="/leads/create" class="inline-block px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition">
+      Ajouter votre premier lead
+    </a>
+  </div>
+<% } %>

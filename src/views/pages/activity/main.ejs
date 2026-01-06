@@ -1,0 +1,93 @@
+<div class="space-y-8">
+  <!-- Header -->
+  <section class="bg-card border border-border rounded-3xl p-6 shadow-sm">
+    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+      <div class="space-y-3">
+        <p class="text-xs uppercase tracking-[0.35em] text-muted">Activity monitor</p>
+          <h1 class="text-3xl md:text-4xl font-semibold text-primary leading-tight">Journal en direct de vos campagnes</h1>
+        <p class="text-muted max-w-2xl text-sm md:text-base">
+          Vue consolidée des performances, conversions et actions récentes.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <button class="px-4 py-2 rounded-xl border border-border text-sm font-semibold text-muted hover:text-primary hover:border-primary transition">
+          Exporter le journal
+        </button>
+        <button class="px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition">
+          Ajouter une note
+        </button>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-8">
+      <article class="rounded-2xl bg-[#111113] text-white p-5">
+        <p class="text-xs uppercase tracking-widest text-white/60">Pages Publiées</p>
+        <p class="text-3xl font-semibold mt-2"><%= stats.published %></p>
+        <p class="text-white/60 text-sm mt-1">en ligne</p>
+      </article>
+      <article class="rounded-2xl border border-border p-5">
+        <p class="text-xs uppercase tracking-widest text-muted">Total</p>
+        <p class="text-3xl font-semibold mt-2"><%= stats.total %></p>
+          <p class="text-muted text-sm mt-1">campagnes</p>
+      </article>
+      <article class="rounded-2xl border border-border p-5">
+        <p class="text-xs uppercase tracking-widest text-muted">Taux moyen</p>
+        <p class="text-3xl font-semibold mt-2"><%= stats.avgConversionRate.toFixed(1) %>%</p>
+        <p class="text-muted text-sm mt-1">taux de conversion</p>
+      </article>
+      <article class="rounded-2xl border border-border p-5">
+        <p class="text-xs uppercase tracking-widest text-muted">Visiteurs totaux</p>
+        <p class="text-3xl font-semibold mt-2"><%= stats.totalVisitors %></p>
+        <p class="text-muted text-sm mt-1">toutes pages</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Landing Pages Table -->
+  <section class="bg-card border border-border rounded-3xl p-6 shadow-sm">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-2xl font-semibold">Suivi des campagnes</h2>
+        <p class="text-muted text-sm">Toutes vos campagnes et leur statut</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button class="px-4 py-2 rounded-xl border border-border text-sm text-muted hover:text-primary hover:border-primary transition">Télécharger CSV</button>
+        <button class="px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition">Synchroniser CRM</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="text-muted border-b border-border">
+              <th class="text-left py-3 font-medium">Campagne</th>
+            <th class="text-left py-3 font-medium">Visiteurs</th>
+            <th class="text-left py-3 font-medium">Taux conversion</th>
+            <th class="text-left py-3 font-medium">Statut</th>
+            <th class="text-right py-3 font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border">
+          <% landingPages.forEach(landingPage => { %>
+            <tr>
+              <td class="py-4">
+                <p class="font-semibold text-primary"><%= landingPage.name %></p>
+                <p class="text-muted text-xs"><%= landingPage.description %></p>
+              </td>
+              <td class="py-4"><%= landingPage.visitors %></td>
+              <td class="py-4">
+                <span class="font-semibold text-<%= landingPage.conversionRate > 5 ? 'success' : 'primary' %>"><%= landingPage.conversionRate %>%</span>
+              </td>
+              <td class="py-4">
+                <span class="px-3 py-1 rounded-full border border-border text-xs">
+                  <%= landingPage.status === 'published' ? 'Publiée' : landingPage.status === 'draft' ? 'Brouillon' : landingPage.status %>
+                </span>
+              </td>
+              <td class="py-4 text-right">
+                <a href="/landingpages/<%= landingPage.id %>" class="text-primary font-semibold hover:underline">Détails</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

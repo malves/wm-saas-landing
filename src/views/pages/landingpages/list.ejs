@@ -1,0 +1,209 @@
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <p class="text-sm text-muted">Campagnes</p>
+    <h1 class="text-3xl font-bold">Mes Campagnes</h1>
+    <p class="text-muted text-sm mt-2">Gérez vos landing pages, filtres et statistiques de conversion.</p>
+  </div>
+  <div class="flex flex-wrap items-center gap-3">
+    <button class="px-4 py-2 rounded-xl border border-border text-muted hover:text-primary hover:border-primary transition text-sm font-semibold">
+      Importer
+    </button>
+    <a href="/landingpages/create" class="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition">
+      Nouvelle campagne
+    </a>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="bg-card border border-border rounded-2xl p-4 mb-6 shadow-sm">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex flex-wrap items-center gap-2">
+      <button class="filter-btn px-3 py-2 rounded-xl bg-primary text-white text-sm font-semibold" data-filter="all">Tout</button>
+      <button class="filter-btn px-3 py-2 rounded-xl text-muted hover:text-primary hover:bg-background transition text-sm font-semibold" data-filter="published">Publiées</button>
+      <button class="filter-btn px-3 py-2 rounded-xl text-muted hover:text-primary hover:bg-background transition text-sm font-semibold" data-filter="draft">Brouillons</button>
+      <button class="filter-btn px-3 py-2 rounded-xl text-muted hover:text-primary hover:bg-background transition text-sm font-semibold" data-filter="paused">En pause</button>
+    </div>
+    <div class="flex flex-col md:flex-row gap-3 w-full lg:w-auto">
+      <div class="relative flex-1 min-w-[280px]">
+        <input type="text" placeholder="Rechercher une landing page" class="w-full bg-background border border-border rounded-xl pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+        <svg class="w-5 h-5 text-muted absolute right-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z"/>
+        </svg>
+      </div>
+      <div class="flex items-center gap-2">
+        <select class="bg-background border border-border rounded-xl px-3 py-2 text-sm text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+          <option>Tri</option>
+          <option>Récents</option>
+          <option>Performants</option>
+          <option>Ordre alphabétique</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- List Grid -->
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+  <% landingPages.forEach((landingPage, index) => {
+    const colors = ['red', 'blue', 'green', 'purple', 'orange'];
+    const color = colors[index % 5];
+
+    // Définir le statut par défaut si non défini
+    const status = landingPage.status || 'draft';
+    
+    let statusColor = 'blue';
+    let statusLabel = 'Brouillon';
+    if (status === 'published') {
+      statusColor = 'green';
+      statusLabel = 'Publiée';
+    } else if (status === 'paused') {
+      statusColor = 'yellow';
+      statusLabel = 'En pause';
+    } else if (status === 'draft') {
+      statusColor = 'blue';
+      statusLabel = 'Brouillon';
+    }
+  %>
+    <div
+      class="landingpage-card bg-card rounded-xl border border-border shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition p-6 flex flex-col gap-6 items-center text-center cursor-pointer"
+      data-status="<%= status %>"
+      data-href="/landingpages/<%= landingPage.id %>"
+    >
+      <div class="w-16 h-16 min-w-[64px] min-h-[64px] bg-<%= color %>-50 rounded-xl flex items-center justify-center mx-auto mb-2">
+        <div class="text-center">
+          <%
+            const words = landingPage.name.toUpperCase().split(' ');
+            let initials = '';
+            if (words.length >= 2) {
+              initials = words[0].charAt(0) + words[1].charAt(0);
+            } else {
+              initials = words[0].substring(0, 2);
+            }
+          %>
+          <div class="text-<%= color %>-600 font-black text-lg"><%= initials %></div>
+        </div>
+      </div>
+      <div>
+        <p class="font-semibold text-base"><%= landingPage.name %></p>
+      </div>
+      <div class="w-full">
+        <span class="px-3 py-1 rounded-full bg-<%= statusColor %>-100 text-<%= statusColor %>-800 border border-<%= statusColor %>-200 text-xs font-medium"><%= statusLabel %></span>
+      </div>
+      <div class="flex items-center gap-2 mt-auto text-base font-semibold">
+        <a href="/landingpages/<%= landingPage.id %>" class="text-primary hover:underline z-10">Voir</a>
+        <span class="text-muted">·</span>
+        <a href="/landingpages/<%= landingPage.id %>/edit" class="text-muted hover:text-primary hover:underline z-10">Modifier</a>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<% if (landingPages.length === 0) { %>
+  <div class="text-center py-12">
+    <p class="text-muted">Aucune landing page trouvée</p>
+    <a href="/landingpages/create" class="inline-block mt-4 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition">
+      Créer votre première campagne
+    </a>
+  </div>
+<% } %>
+
+<script>
+(function() {
+  'use strict';
+  
+  // Attendre que le DOM soit complètement chargé
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFilters);
+  } else {
+    initFilters();
+  }
+  
+  function initFilters() {
+    console.log('Initialisation des filtres...');
+    
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const landingPageCards = document.querySelectorAll('.landingpage-card');
+    const cardsContainer = document.querySelector('.grid');
+    
+    console.log('Boutons de filtre trouvés:', filterButtons.length);
+    console.log('Cartes trouvées:', landingPageCards.length);
+    
+    // Debug: Afficher les statuts des cartes
+    landingPageCards.forEach((card, index) => {
+      const status = card.getAttribute('data-status');
+      console.log(`Carte ${index}: status="${status}"`);
+    });
+    
+    function filterCards(filterType) {
+      console.log('Filtrage avec:', filterType);
+      let visibleCount = 0;
+      
+      landingPageCards.forEach(card => {
+        const cardStatus = card.getAttribute('data-status');
+        
+        if (filterType === 'all' || filterType === cardStatus) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      console.log('Cartes visibles:', visibleCount);
+      
+      // Afficher un message si aucune carte n'est visible
+      const noResultMsg = document.getElementById('no-result-message');
+      if (noResultMsg) {
+        noResultMsg.remove();
+      }
+      
+      if (visibleCount === 0 && cardsContainer) {
+        const message = document.createElement('div');
+        message.id = 'no-result-message';
+        message.className = 'col-span-full text-center py-12 bg-background rounded-2xl border border-border';
+        message.innerHTML = '<p class="text-muted text-lg">Aucune campagne trouvée avec ce filtre</p>';
+        cardsContainer.appendChild(message);
+      }
+    }
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const filterType = this.getAttribute('data-filter');
+        console.log('Clic sur filtre:', filterType);
+        
+        // Mise à jour visuelle des boutons
+        filterButtons.forEach(btn => {
+          btn.classList.remove('bg-primary', 'text-white');
+          btn.classList.add('text-muted');
+        });
+        
+        this.classList.add('bg-primary', 'text-white');
+        this.classList.remove('text-muted');
+        
+        // Filtrer les cartes
+        filterCards(filterType);
+      });
+    });
+
+    // Rendre les cartes cliquables
+    landingPageCards.forEach(card => {
+      card.addEventListener('click', function(event) {
+        // Ne pas rediriger si on clique sur un lien
+        if (event.target.tagName === 'A' || event.target.closest('a')) {
+          return;
+        }
+        const href = this.getAttribute('data-href');
+        if (href) {
+          window.location.href = href;
+        }
+      });
+    });
+    
+    console.log('Filtres initialisés avec succès');
+  }
+})();
+</script>
